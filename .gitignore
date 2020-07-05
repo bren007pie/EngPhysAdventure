@@ -1,4 +1,7 @@
 *.pyc
 *.csv
 cache/
+.idea/
+env/
 __pycache__/
+

@@ -45,6 +45,8 @@ def Reset():
     # Ineffecient due to number of empty spaces and each dimension being 10x10x5 but whatever for now
     MAPS1 = [ [ [ [None for dim in range(DRANGE)] for z in range(ZRANGE)] for y in range(YRANGE)] for x in range(XRANGE) ]
     #MAPS1 = [ [ [None for y in range(ZRANGE)] for y in range(YRANGE)] for x in range(XRANGE)]
+    #Creating lists using list comprehension ex) new_list = [expression for member in iterable]
+    #https://realpython.com/list-comprehension-python/#how-to-create-lists-in-python
 
     #def __init__(self,name,location,info,lore,walls,inside)
     #Locations: Place.name = "Name" - Place.location = (X,Y,Z) - Place.info = "location information" - Place.lore = "lore"

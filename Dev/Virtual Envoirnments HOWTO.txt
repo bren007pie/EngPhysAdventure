@@ -1,0 +1,11 @@
+Documentation Page:
+https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
+
+Windows Activating Virtual Envoirnment:
+On Windows:
+
+.\env\Scripts\activate
+
+
+Deactivate Virtual Envoirnment:
+deactivate
