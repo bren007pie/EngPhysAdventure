@@ -1,7 +1,7 @@
 *.pyc
 *.csv
+env/
 cache/
 .idea/
-env/
 __pycache__/
 

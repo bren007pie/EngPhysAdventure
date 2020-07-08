@@ -30,7 +30,7 @@ def two_tuple_add(a, b):  # adds 2 tuples element-wise
 #       Unless someone does something fancy to automatically update it but I don't feel it's necessary.
 
 class Equipment:
-    def __init__(self,name,location,image,info,worn,stats,health, extra1 = None, extra2 = None):
+    def __init__(self,name,location,image,info,worn,stats,health):
         self.name = str(name)
         self.colouredname = "" +itemcolour+ name +textcolour+ ""
         self.image = str(image)  # This is an obsolete field from when the game was going to have pictures
@@ -40,12 +40,10 @@ class Equipment:
         self.location = location
         self.health = health  # this is a health into for healed amount for eating. If no eating it should be a ""
         self.quest = False  # This is a inspected flag if it's been picked up or inspected
-        self.extra1 = extra1
-        self.extra2 = extra2
 
     
 class Character:
-    def __init__(self,name,location,health,inv,emptyinv, extra1 = None, extra2 = None):
+    def __init__(self,name,location,health,inv,emptyinv):
         self.name = str(name)
         self.colouredname = "" + personcolour + name + textcolour + ""
         self.location = location
@@ -57,8 +55,7 @@ class Character:
         self.stats = six_tuple_add(self.inv['head'].stats, self.inv['body'].stats, self.inv['hand'].stats, self.inv['off-hand'].stats, tuple(self.basestats), (0, 0, 0)) #adds tuples together to new stats to make actual stats
         self.alive = True
         self.spoke = False  # What is this used for?
-        self.extra1 = extra1
-        self.extra2 = extra2
+
 
         
         for i in inv:
@@ -69,6 +66,7 @@ class Character:
 
     def equip(self,Equip):
         drop = 0
+        # You're already wearing the thing
         if self.inv[Equip.worn] == Equip:
             printT(" (\S)You realize this you already have a " + Equip.colouredname + " on you. It's okay, we all have tough days. (\S)",72,0.25)
 
@@ -127,7 +125,7 @@ class Character:
 
 #TODO Switch order of drop and need AND sinfo for defining to be consistant with interacts
 class Enemy:
-    def __init__(self,name,info,location,stats,health,drop,need,Sinfo,Dinfo,aesthetic, extra1 = None, extra2 = None):
+    def __init__(self,name,info,location,stats,health,drop,need,Sinfo,Dinfo,aesthetic):
         self.name = str(name)
         self.colouredname = "" + personcolour + name + textcolour + ""
         self.info = str(info)
@@ -142,17 +140,15 @@ class Enemy:
         self.alive = True
         self.quest = False
         self.spoke = False
-        self.extra1 = extra1
-        self.extra2 = extra2
 
 
 class Animal(Enemy):  # this is an inhertance of enemy class. NICE.
     # Constructor
-    def __init__(self,name,info,location,stats,health,drop,need,Sinfo,Dinfo,pinfo,aesthetic, extra1 = None, extra2 = None):
+    def __init__(self,name,info,location,stats,health,drop,need,Sinfo,Dinfo,pinfo,aesthetic):
         self.pinfo = pinfo
 
         # invoking the __init__ of the parent class
-        Enemy.__init__(self,name,info,location,stats,health,drop,need,Sinfo,Dinfo,aesthetic, extra1 = None, extra2 = None)
+        Enemy.__init__(self,name,info,location,stats,health,drop,need,Sinfo,Dinfo,aesthetic)
 
         #printT(self.name  # can totally do commands in the init)
 
@@ -162,7 +158,7 @@ class Animal(Enemy):  # this is an inhertance of enemy class. NICE.
 
 
 class Interact:
-    def __init__(self,name,location,info,Sinfo,need,drop,aesthetic, extra1 = None, extra2 = None):
+    def __init__(self,name,location,info,Sinfo,need,drop,aesthetic):
         self.name = name
         self.colouredname = "" + interactcolour + name + textcolour + ""
         self.location = location
@@ -172,8 +168,7 @@ class Interact:
         self.drop = drop
         self.quest = False
         self.aesthetic = aesthetic # If the enemy is not for anything aesthetic = True for a couple diff uses
-        self.extra1 = extra1
-        self.extra2 = extra2
+
 
     def drop_objects(self,Item,x,y,z,dim,MAPS,ITEMS,INTERACT,ENEMIES):  # this is a general method to drop objects
         # THIS PARSING ONLY Works if all item keys are unique
@@ -195,8 +190,8 @@ class Interact:
 # Item list
 # Interactables list
 # Enemies list (rename enemies to NPCs)
-class Map:  #Map Location Storage
-    def __init__(self, name, location, info, lore, walls, inside, size=None, links=[], extra1 = None, extra2 = None): #size = (None) means default is none object unless otherwise defined
+class Map:  # Map Location Storage
+    def __init__(self, name, location, info, lore, walls, inside, size=None, links=[]):  # size = (None) means default is none object unless otherwise defined
         self.name = str(name)       # Name of location
         self.colouredname = "" + mapcolour + name + textcolour + ""
         # Dim is the dimension/ building number associated with the place, by default Overworld is 0, Bsb is 1, etc
@@ -223,8 +218,6 @@ class Map:  #Map Location Storage
         #   moves they will will go to a different spot on the interior (so you don't have to step around BSB) or JHE
         # Walls can be used to close and open links as they won't let the player move into it and are mutable
         # Using tuples here because they're faster but if want to be changed can use nested lists (mutable)
-        self.extra1 = extra1
-        self.extra2 = extra2
 
 
         
@@ -433,7 +426,7 @@ class Map:  #Map Location Storage
         # Don't need to return the 'Global' objects from function as affecting scope outside the function
 
 
-# The pickler needs to be in the same level as the defined
+# The pickler needs to be in the same level as the defined classes
 
 def pickle_game(DATA,savegamepath):
 
