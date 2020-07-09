@@ -21,6 +21,8 @@ class CApp(cevent.CEvent):
         self.running = True
         self._image_surf = pygame.image.load("hacker.jpg").convert()
 
+        self.myfont = pygame.font.SysFont('arial',69,True,True)
+
     def on_loop(self):
 
         pass
@@ -30,6 +32,7 @@ class CApp(cevent.CEvent):
         pygame.draw.rect(self.display_surf,(255,0,0),pygame.Rect(0,0,640,400))  # Background
         #print(self.image_y, self.image_Vy)
         self.display_surf.blit(self._image_surf,(self.image_x,self.image_y))
+        self.display_surf.blit(self.myfont.render("Chikens are good", False, (0,0,255)),(0,0))  # Blit order does matter
         pygame.display.flip()
 
         self.clock.tick(60)
