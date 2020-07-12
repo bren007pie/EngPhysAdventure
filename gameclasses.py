@@ -28,15 +28,19 @@ class Entity():
     def set_inventory(self,new_inventory):
         self.inventory = new_inventory
 
-    def add_inventory(self,addiition ):
+    def add_to_inventory(self,addiition ):
         self.inventory.append(addiition)
 
-    def remove_inventory(self,removal):
+    def remove_from_inventory(self,removal):
         self.inventory.remove(removal)
 
-    def in_inventory(self,search):
+    def is_in_inventory(self,search):
         return(self.inventory.__contains__(search))
 
-
-
+    def update(self):  # this is a template for polymorphism from inheritted classes
+        # https: // gameprogrammingpatterns.com / update - method.html
+        # The game loop maintains a collection of objects, but it doesn’t know their concrete types.
+        # All it knows is that they can be updated.
+        # This separates each object’s behavior both from the game loop and from the other objects.
+        pass
 
