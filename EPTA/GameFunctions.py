@@ -2,7 +2,7 @@
 
 
 from GameClasses import *
-import StartUp
+import game_objects_2018 as game_objects
 import AsciiArt
 import time
 import os  # used to put files in the cache folder
@@ -16,10 +16,10 @@ from sys import platform
 # TODO will be changed to pass by reference) and dictionaries used to store many variables/objects in one
 #   place while making it clear in the code which one is being referenced
 
-MAPS = StartUp.WorldMap()
-ITEMS = StartUp.ItemDictionary()
-ENEMIES = StartUp.EnemyDictionary()
-INTERACT = StartUp.InteractDictionary()
+MAPS = game_objects.WorldMap()
+ITEMS = game_objects.ItemDictionary()
+ENEMIES = game_objects.EnemyDictionary()
+INTERACT = game_objects.InteractDictionary()
 DIMENSIONS = ["OverWorld", "BSB", "Capstone Room", "Green Lake", "Haunted Forest","Cabin in the Woods"]  # List of interior names with the index location being the dimension/building number
 # ex) 0 is OverwWord, 1 is BSB, 2 is capstone room, etc
 
@@ -85,7 +85,7 @@ STARTINV = {'head':EMPTYHEAD,'body':EMPTYBODY,'hand':EMPTYHAND,'off-hand':ITEMS[
 
 # OBJECTS need to be UNIQUE so that the location doesn't get messed up when duplicate objects in the game
 TYINV = {'head':ITEMS["tyler's visor glasses"],'body':ITEMS["tyler's big hits shirt"],'hand':ITEMS["tyler's hulk hands"],'off-hand':ITEMS["tyler's green bang bong"]} #gets to have the Iron Ring when he graduates
-BRENSTARTLOCATION = (2,3,1,0)  # Dev start location
+BRENSTARTLOCATION =  (0, 0, 0, 1)  # Dev start location
 # (4,0,0,4)  haunted forest
 # (2,3,1,0)  default location
 # EACH INVENTORY HAS TO BE UNIQUE

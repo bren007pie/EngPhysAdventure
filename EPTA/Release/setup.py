@@ -77,7 +77,7 @@ bdist_msi_options = {'data': msi_data}
 #This governs the artributes of the EXE being made
 #All these commented ones are either not supported anymore or I don't know how to use them
 target = cx_Freeze.Executable(
-    script="EngPhysAdventure Alpha v0.30.py",  # Name of the main script
+    script="main.py",  # Name of the main script
     #base="Win64GUI",
     #targetDir = r"dist",
     targetName = "EngPhysTextAdventure.exe",

@@ -2,7 +2,7 @@
 # Mitchell Lemieux, Tyler Kashak, and Brendan Fallon
 # First written on Mar  21,2019 by Brendan Fallon:
 """
-This Quests.py file is used to write the story, quests, and events of the game by changing objects based on conditions.
+This game_scripts_2017.py file is used to write the story, quests, and events of the game by changing objects based on conditions.
 EngPhysStory() is the main Eng Phys storyline  and returns once its finished
 Quests generally only happen once and are sidequests unrelated to the storyline that do something special
 Events are reoccurring based on the condition for the game.
@@ -177,7 +177,7 @@ def sidequests(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESET
 
 
 
-def ebta_story(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):
+def story(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):
     # # These are all the global dictionaries/objects in the game. Anywhere where a loadgame happens you need all the global variables
     # global PLAYER  # The main character. player is an object instance of class character.
     # global ITEMS  # All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item.name). Remember the lowercase, may trip you up if referencing upercase version in the file.

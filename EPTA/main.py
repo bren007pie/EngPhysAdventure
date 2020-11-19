@@ -1,24 +1,26 @@
 """
 ###Notes###
-This is the main file for the Eng Phys Text Adventure (EPTA). This game utilizes some poorly done OOP (sorry Mitch), it has it's strengths though!
+This is the main entrance file for the Nevada game engine and Eng Phys Text Adventure (EPTA). This game utilizes some poorly done OOP (sorry Mitch), it has it's strengths though!
 The comments, organization, and optimization are bad but generally:
 this file = the setup, main loop, and ending. Run this to run the game.
 GameFunctions.py = The main mechanics of the game and the quests. All non-class functions. 
 GameClasses.py = Class definitions and their coresponding functions.
-Startup.py = All the map locations, items, npcs (called enemies), and interactables. Also creates the dictionaries of them.
+game_objects_x.py = All the map locations, items, npcs (called enemies), and interactables. Also creates the dictionaries of them.
 Setup.py = Py2exe file used to compile into an exe. Run using "python setup.py py2exe" in command prompt.
 
 In general try to keep this structure and put any other long ascii or modules into another file.
 """
 from GameFunctions import * #this imports the code and all the code dependancies (functions imported in that)
-import StartUp
 import Opening    #don't import * from these b.c. these pull global variables from game functions and doing a recursive import creates errors
-import CreativeMode #don't import * from these b.c. these pull global variables from game functions and doing a recursive import creates errors
-import Quests  # Used to separate quest/event functions
+import game_scripts_2018 as game_scripts  # Used to separate quest/event functions
 import TextParser  # Used to separate text interpretation and commands
 from Colour import *
-from TextParser import *
 import AsciiArt
+
+#from TextParser import *  got rid of this to reduce import tracing tracking problems but may break everything
+#import game_objects_2017
+#import CreativeMode #don't import * from these b.c. these pull global variables from game functions and doing a recursive import creates errors
+
 
 
 import MapDisplay  # Used to separate minim-ap display
@@ -26,12 +28,12 @@ import MapDisplay  # Used to separate minim-ap display
 
 # TODO Make sure to change BOTH versions and release date are correct
 #If there was a title screen it would go here
-GAMEINFO['version'] = "0.30.01"
-GAMEINFO['versionname'] = lightblue + "Alpha " + red +"v" + white +"0.30.01 - " + blue + 'T' + cyan + 'H' + red + 'E ' \
+GAMEINFO['version'] = "0.31.XX"
+GAMEINFO['versionname'] = lightblue + "Beta " + red +"v" + white +"0.30.01 - " + blue + 'T' + cyan + 'H' + red + 'E ' \
                             + green + 'F' + lightgreen + 'I' + lightblue + 'N' + lightcyan + 'A' + lightgreen + 'L ' \
                             + lightmagenta + 'E' + lightred + 'P' + lightwhite + 'T' + lightyellow + 'A ' + magenta \
                             + 'U' + red + 'P' + white + 'D' + yellow + 'A' + blue + 'T' + red + 'E' + textcolour
-GAMEINFO['releasedate'] = "Nov 21, 2019"
+GAMEINFO['releasedate'] = "Nov 21, 2020"
 
 
 
@@ -148,13 +150,13 @@ def Main(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
         if GAMESETTINGS['HardcoreMode']: print(CLEARSCREEN)
 
         # Sends the command text to the text parser to be interpreted and action to be done
-        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
+        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = TextParser.Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
 
         GAMEINFO['commandcount'] += 1  # increments the command count after every command but doesn't print
         #print LINEBREAK  # Got rid of this bottom linebreak to hopefully have the current situation more clear
-        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = Quests.ebta_story(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # runs through the story quests checks and actions
-        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = Quests.sidequests(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # runs through all the sidequest checks and actions
-        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = Quests.events(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # runs through all the events checks and actions
+        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = game_scripts.story(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # runs through the story quests checks and actions
+        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = game_scripts.sidequests(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # runs through all the sidequest checks and actions
+        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = game_scripts.events(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # runs through all the events checks and actions
 
         #TODO integrate this into game functions with a function, possibly seperate quests from game functions and import all from there to keep things global
         if PLAYER.alive == False and GAMEINFO['layersdeep'] > 0:  # gets you out of the EPTA all the way down quest and back into the sublayer

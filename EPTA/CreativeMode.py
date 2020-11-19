@@ -3,7 +3,7 @@
 #Wrote on Dec  22,2018: 
 import pickle
 from GameFunctions import * #importing the global dictionaries/values
-from StartUp import XRANGE, YRANGE, ZRANGE, DRANGE #Importing the map bound variables from StartUp to be used in the load function
+import game_objects_2018 as game_objects
 import CSVSaves
 from Colour import *
 
@@ -80,10 +80,10 @@ from Colour import *
 #         # for setting in GAMESETTINGS:
 #         #     GAMESETTINGS[setting] = loadsettings[setting]  # doesn't need .__dict___ for some reason
 #         # #for some reason putting MAPS load below these other ones fixed a bunch of bugs
-#         # for x in range(XRANGE):
-#         #     for y in range(YRANGE):
-#         #         for z in range(ZRANGE):
-#         #             for dim in range (DRANGE):
+#         # for x in range(game_objects.XRANGE):
+#         #     for y in range(game_objects.YRANGE):
+#         #         for z in range(game_objects.ZRANGE):
+#         #             for dim in range (game_objects.DRANGE):
 #         #                 if MAPS[x][y][z][dim]:  # There are different objects in 1 vs the other so need to replace object in each list with the new one of reference
 #         #                     MAPS[x][y][z][dim].__dict__ = loadmap[x][y][z][dim].__dict__
 #         #                     # Attempting to load in the map items to stop ghosting
@@ -167,10 +167,10 @@ def updateSave(save): #this file tries to autoatically update the save file
         for quest in QUESTS:
             QUESTS[quest] = loadquest[quest]
         #for some reason putting MAPS load below these other ones fixed a bunch of bugs
-        for x in range(XRANGE):
-            for y in range(YRANGE):
-                for z in range(ZRANGE):
-                    for dim in range(DRANGE):
+        for x in range(game_objects.XRANGE):
+            for y in range(game_objects.YRANGE):
+                for z in range(game_objects.ZRANGE):
+                    for dim in range(game_objects.DRANGE):
                         if MAPS[x][y][z][dim]: #There are different objects in 1 vs the other so need to replace object in each list with the new one of reference
                             MAPS[x][y][z][dim].__dict__ = loadmap[x][y][z][dim].__dict__
     

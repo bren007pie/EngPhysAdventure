@@ -17,7 +17,7 @@ TODO add encryption of these files so a pickler isn't needed
 
 import csv
 import os  # Used for file navigation
-from StartUp import XRANGE, YRANGE, ZRANGE, DRANGE  # Importing the map bound variables from StartUp to be used in the load
+import game_objects_2018 as game_objects
 
 
 
@@ -59,10 +59,10 @@ def entities_to_CSV(PLAYER, ITEMS, MAPS, ENEMIES, INTERACT, QUESTS, GAMEINFO, GA
         writer = csv.writer(f, delimiter=',')  # defining the writer object
         writer.writerow(mheader)  # write the header list
         # This big guy loops through the map locations using the dumb index notation, hopefully that will go away soon
-        for x in range(XRANGE):
-            for y in range(YRANGE):
-                for z in range(ZRANGE):
-                    for dim in range(DRANGE):
+        for x in range(game_objects.XRANGE):
+            for y in range(game_objects.YRANGE):
+                for z in range(game_objects.ZRANGE):
+                    for dim in range(game_objects.DRANGE):
                         # There are different objects in 1 vs the other so need to replace object with the new one
                         if MAPS[x][y][z][dim]:
                             # accessing the object inter he dictionary and storing it to a temporary variable
@@ -78,11 +78,11 @@ def entities_to_CSV(PLAYER, ITEMS, MAPS, ENEMIES, INTERACT, QUESTS, GAMEINFO, GA
     with open(csvPath + "SpecialMap.csv", "wb") as f:
         writer = csv.writer(f, delimiter=',')  # defining the writer object
         # Since the printout will be much larger than the number of map spaces the space needs to be defined first
-        XSize = XRANGE * 2 + 3  # size of the border formed by the range in each direction based on the map size
-        YSize = YRANGE * 2 + 3
+        XSize = game_objects.XRANGE * 2 + 3  # size of the border formed by the range in each direction based on the map size
+        YSize = game_objects.YRANGE * 2 + 3
 
         # Special Map Writer Loop
-        for Z in range(ZRANGE):  # Each cross-section is a Z level
+        for Z in range(game_objects.ZRANGE):  # Each cross-section is a Z level
             writer.writerow(["This map is for display purposes only, editing will not do anything"])
             # Map prinout Constructor:
             # This makes a 2 dimensional list of each item which will be filled with data later
