@@ -35,8 +35,8 @@ class Equipment:
         self.colouredname = "" +itemcolour+ name +textcolour+ ""
         self.image = str(image)  # This is an obsolete field from when the game was going to have pictures
         self.info = str(info)  # This is the base description that is read
-        self.worn = str(worn)  # Which inventory slot the item takes up
-        self.stats = stats   # These are the stats the item gives you that adds to the base stats
+        self.worn = str(worn)  # Which inventory slot the item_object takes up
+        self.stats = stats   # These are the stats the item_object gives you that adds to the base stats
         self.location = location
         self.health = health  # this is a health into for healed amount for eating. If no eating it should be a ""
         self.quest = False  # This is a inspected flag if it's been picked up or inspected
@@ -61,45 +61,45 @@ class Character:
         for i in inv:
             inv[i].location = self.location
         
-    def updateStats(self): #updates stats based on changing equipment
+    def update_stats(self): #updates stats based on changing equipment
         self.stats = six_tuple_add(self.inv['head'].stats, self.inv['body'].stats, self.inv['hand'].stats, self.inv['off-hand'].stats, tuple(self.basestats), (0, 0, 0))
 
-    def equip(self,Equip):
+    def equip(self, equip_item_object):
         drop = 0
         # You're already wearing the thing
-        if self.inv[Equip.worn] == Equip:
-            printT(" (\S)You realize this you already have a " + Equip.colouredname + " on you. It's okay, we all have tough days. (\S)",72,0.25)
+        if self.inv[equip_item_object.worn] == equip_item_object:
+            printT(" (\S)You realize this you already have a " + equip_item_object.colouredname + " on you. It's okay, we all have tough days. (\S)", 72, 0.25)
 
         # if your inventory is empty
-        elif (self.location == list(Equip.location) and self.inv[Equip.worn] == self.emptyinv[Equip.worn]):
-            self.inv[Equip.worn] = Equip
-            Equip.location = self.location
-            printT(" (\S)" +Equip.info + " (\S)",72,0.25)
-            printT("You've equipped the " + Equip.colouredname + ' to your ' + Equip.worn + ".",72,0.25)
+        elif (self.location == list(equip_item_object.location) and self.inv[equip_item_object.worn] == self.emptyinv[equip_item_object.worn]):
+            self.inv[equip_item_object.worn] = equip_item_object
+            equip_item_object.location = self.location
+            printT(" (\S)" + equip_item_object.info + " (\S)", 72, 0.25)
+            printT("You've equipped the " + equip_item_object.colouredname + ' to your ' + equip_item_object.worn + ".", 72, 0.25)
         # If you have something on you that you're replacing
-        elif(self.location == list(Equip.location)):
-            drop = self.inv[Equip.worn]
-            self.inv[Equip.worn] = Equip
-            Equip.location = self.location
-            printT(" (\S)"+ Equip.info + " (\S)")
-            printT("You've equipped the " + Equip.colouredname + ' to your ' + Equip.worn + ', the ' + drop.colouredname + ' has been dropped.')
+        elif(self.location == list(equip_item_object.location)):
+            drop = self.inv[equip_item_object.worn]
+            self.inv[equip_item_object.worn] = equip_item_object
+            equip_item_object.location = self.location
+            printT(" (\S)" + equip_item_object.info + " (\S)")
+            printT("You've equipped the " + equip_item_object.colouredname + ' to your ' + equip_item_object.worn + ', the ' + drop.colouredname + ' has been dropped.')
         else:
-            printT(" (\S)You can't find a " + Equip.colouredname + " around here. Maybe it's your hungover brain.")
-        self.updateStats()
+            printT(" (\S)You can't find a " + equip_item_object.colouredname + " around here. Maybe it's your hungover brain.")
+        self.update_stats()
         return drop
 
-    def drop(self,Equip):  # Equip is an object not a name
+    def drop(self, drop_item_object):  # Equip is an object not a name
         drop = 0
-        if(Equip.name == self.inv[Equip.worn].name):
-            self.inv[Equip.worn] = self.emptyinv[Equip.worn]
-            printT(" (\S)You've dropped the " + Equip.colouredname +".")
-            drop = Equip
+        if(drop_item_object.name == self.inv[drop_item_object.worn].name):
+            self.inv[drop_item_object.worn] = self.emptyinv[drop_item_object.worn]
+            printT(" (\S)You've dropped the " + drop_item_object.colouredname + ".")
+            drop = drop_item_object
         else:
-            printT("Maybe you're still drunk?. You aren't carrying " + Equip.colouredname + ".")
-        self.updateStats()
+            printT("Maybe you're still drunk?. You aren't carrying " + drop_item_object.colouredname + ".")
+        self.update_stats()
         return drop
 
-    def ShowInventory(self):
+    def show_inventory(self):
 
         Head = "head\t\t"+self.inv['head'].name+"\t"+str(self.inv['head'].stats)+"\n"
         Body = "body\t\t"+self.inv['body'].name+"\t"+str(self.inv['body'].stats)+"\n"
@@ -110,7 +110,7 @@ class Character:
     def show_attributes(self):
         print("name: " + str(self.name))
         print("location: " + str(self.location))
-        self.ShowInventory()
+        self.show_inventory()
         print("emptyinv: " + str(self.emptyinv))
         print("health: " + str(self.health))
         print("maxhealth: " + str(self.maxhealth))
@@ -118,8 +118,6 @@ class Character:
         print("stats: " + str(self.stats))
         print("alive: " + str(self.alive))
         print("spoke: " + str(self.spoke))
-        print("extra1: " + str(self.extra1))
-        print("extra2: " + str(self.extra2))
 
 
 
@@ -134,7 +132,7 @@ class Enemy:
         self.health = health
         self.Sinfo = Sinfo  # special info displayed if you give them what they need
         self.Dinfo = Dinfo  # death info displayed if they need
-        self.need = need  # what the need, if you talk to them with this item you'll get the drop and it will set the quest flag to True
+        self.need = need  # what the need, if you talk to them with this item_object you'll get the drop and it will set the quest flag to True
         self.drop = drop
         self.aesthetic = aesthetic  # If the enemy is not for anything aesthetic = True for a couple diff. uses
         self.alive = True
@@ -171,18 +169,18 @@ class Interact:
 
 
     def drop_objects(self,Item,x,y,z,dim,MAPS,ITEMS,INTERACT,ENEMIES):  # this is a general method to drop objects
-        # THIS PARSING ONLY Works if all item keys are unique
-        if INTERACT[Item].drop in list(ITEMS.keys()):  # if it's an ITEM (in the item keys)
-            MAPS[x][y][z][dim].placeItem(ITEMS[INTERACT[Item].drop])
+        # THIS PARSING ONLY Works if all item_object keys are unique
+        if INTERACT[Item].drop in list(ITEMS.keys()):  # if it's an ITEM (in the item_object keys)
+            MAPS[x][y][z][dim].place_item(ITEMS[INTERACT[Item].drop])
             printT("You see " + ITEMS[INTERACT[Item].drop].colouredname+ ". (\S)")
-        elif INTERACT[Item].drop in list(ENEMIES.keys()):  # if it's an Enemy
-            MAPS[x][y][z][dim].placeEnemy(ENEMIES[INTERACT[Item].drop])
+        elif INTERACT[Item].drop in list(ENEMIES.keys()):  # if it's an enemy_object
+            MAPS[x][y][z][dim].place_enemy(ENEMIES[INTERACT[Item].drop])
             printT("You see " + ENEMIES[INTERACT[Item].drop].colouredname + ". (\S)")
         elif INTERACT[Item].drop in list(INTERACT.keys()):  # if it's an Interactable
-            MAPS[x][y][z][dim].placeInteract(INTERACT[INTERACT[Item].drop])
+            MAPS[x][y][z][dim].place_interact(INTERACT[INTERACT[Item].drop])
             printT("You see " + INTERACT[INTERACT[Item].drop].colouredname + ". (\S)")
             # TODO Make this an option maybe so it doesn't have to remove itself
-            MAPS[x][y][z][dim].removeInteract(INTERACT[Item])  # If it's an interactable place it's an upgrade/transform
+            MAPS[x][y][z][dim].remove_interact(INTERACT[Item])  # If it's an interactable place it's an upgrade/transform
 
 #TODO GET RID OF location checking in GAMEFUNCTIONS AND location attribute entirely and just use storage lists in each map location
 # Should get rid of duplicate problems AND will go better with adjacency lists probably.
@@ -226,41 +224,41 @@ class Map:  # Map Location Storage
         
         #OR Make another coordinate d, dimension to specify interriors, but I'm leaning away from this
         #   although it would look cleaner on a spreadsheet
-    def placeItem(self,item):  # the item object, works with the drop method in the character class
-        if item:
-            self.items.append(item)
-            item.location=self.location
+    def place_item(self, item_object):  # the item_object object, works with the drop method in the character class
+        if item_object:
+            self.items.append(item_object)
+            item_object.location=self.location
             
-    def placeEnemy(self,Enemy):
-        self.ENEMY.append(Enemy)
-        Enemy.location = self.location
+    def place_enemy(self, enemy_object):
+        self.ENEMY.append(enemy_object)
+        enemy_object.location = self.location
         
-    def placeInteract(self,Interact):
-        if Interact:
-            self.items.append(Interact)
-            Interact.location = self.location
+    def place_interact(self, interact_object):
+        if interact_object:
+            self.items.append(interact_object)
+            interact_object.location = self.location
 
-    def removeWall(self, wall):  # this is used to remove walls of rooms given the wall. WALLS have to be a lisst not a tuple to be mutable
-        if wall in self.walls: 
-            self.walls.remove(wall)  # removes the wall from the list. wall attribute is direction it's blocking such as 'l'. HOWEVER The walls have to be in square [] not circle brackets () so its a list instead of a tuple. Lists are mutable, tuples are not
+    def remove_wall(self, wall_string):  # this is used to remove walls of rooms given the wall. WALLS have to be a lisst not a tuple to be mutable
+        if wall_string in self.walls:
+            self.walls.remove(wall_string)  # removes the wall from the list. wall attribute is direction it's blocking such as 'l'. HOWEVER The walls have to be in square [] not circle brackets () so its a list instead of a tuple. Lists are mutable, tuples are not
             
-    def removeItem(self,item):  # had to be rewritted with load or else load function would create duplciate glitch
+    def remove_item(self, item_object):  # had to be rewritted with load or else load function would create duplciate glitch
         for i in self.items:  # weird way to write it but loops through the items in that lcoation and if the name matches it removes it
-            if i.name ==item.name:
+            if i.name ==item_object.name:
                 self.items.remove(i)
             
-    def removeEnemy(self,enemy):
-        if enemy in self.ENEMY:
-            self.ENEMY.remove(enemy)
-            enemy.location = (None,None,None,None)  # removes the enemy location so they can't be talked to. Has to be a tuple of Nones or else not itterable in compares
+    def remove_enemy(self, enemy_object):
+        if enemy_object in self.ENEMY:
+            self.ENEMY.remove(enemy_object)
+            enemy_object.location = (None, None, None, None)  # removes the enemy location so they can't be talked to. Has to be a tuple of Nones or else not itterable in compares
 
-    def removeInteract(self,Interact):  # had to be rewritted with load or else load function would create duplciate glitch
+    def remove_interact(self, interact_object):  # had to be rewritted with load or else load function would create duplciate glitch
         for i in self.items:  # weird way to write it but loops through the items in that lcoation and if the name matches it removes it
-            if i.name == Interact.name:
+            if i.name == interact_object.name:
                 self.items.remove(i)
 
 
-    # This function is the main thing that says what's in the area.
+    # This method that displays what's in the area.
     def search(self,MAPS,DIMENSIONS,GAMESETTINGS,Spawn=False):  # Is passed MAPS dictionary so it can search area around it
         #also test the displays of things. [People], ~Places~, <Things>, /Interactables/ (put these next to descriptions)
 
@@ -286,11 +284,11 @@ class Map:  # Map Location Storage
         # This big if statement basically does a printout to account for single object/enemy in the area grammer
         if length:
             description += "You see"
-            if length > 1:  # If there's more than one item/interact in the area
+            if length > 1:  # If there's more than one item_object/interact in the area
                 for i in range(length):
                     if (i == length-1):
                         if isinstance(self.items[i],Equipment):
-                            description = description +textcolour+" and a " + str(shortkey) + "" + "" + self.items[i].colouredname + "" + ".\n" #item highlight, checks to see if object is of class equipment and if not it's an interactable
+                            description = description +textcolour+" and a " + str(shortkey) + "" + "" + self.items[i].colouredname + "" + ".\n" #item_object highlight, checks to see if object is of class equipment and if not it's an interactable
                             #shortkey += 1  # increments the shortkey
                         else:
                             description = description +textcolour+" and a " + str(shortkey) + "" + "" + self.items[i].colouredname + "" + ".\n" #inspectable highlight
@@ -302,7 +300,7 @@ class Map:  # Map Location Storage
                         else:
                             description = description +textcolour+ " a " + str(shortkey) + "" + "" + self.items[i].colouredname + "" + ","
                             #shortkey += 1  # increments the shortkey
-            else:  # if there's only 1 item/interact in the area
+            else:  # if there's only 1 item_object/interact in the area
                 if isinstance(self.items[0],Equipment):
                     description = description +textcolour+ " a " + str(shortkey) + "" + "" + self.items[0].colouredname + "" + ".\n" # equipment highlight
                     #shortkey += 1  # increments the shortkey
@@ -340,8 +338,8 @@ class Map:  # Map Location Storage
                     #shortkey += 1  # increments the shortkey
 
         # if self.interact:
-        #     for item in self.interact:
-        #         description = description + "/" + item.info + "/\n"
+        #     for item_object in self.interact:
+        #         description = description + "/" + item_object.info + "/\n"
                 
         if not self.ENEMY and not self.items:  # if there's nothing in the location
             description += textcolour + " (\S)There isn't a whole lot to see."

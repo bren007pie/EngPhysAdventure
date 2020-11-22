@@ -17,7 +17,7 @@ TODO add encryption of these files so a pickler isn't needed
 
 import csv
 import os  # Used for file navigation
-import game_objects_2018 as game_objects
+import game_objects_2017 as game_objects
 
 
 
@@ -27,7 +27,7 @@ csvPath = os.path.join(os.getcwd(), "Dev", "")  # Gives the base path so the CSV
 def entities_to_CSV(PLAYER, ITEMS, MAPS, ENEMIES, INTERACT, QUESTS, GAMEINFO, GAMESETTINGS):
     """This function exports all the main dictionaries/entities in memory to csv files with some special formatting.
     This is called in CreativeMode when you save the game.
-    For Developers: The code blocks are very similar aside from the particulars of each class so only the item class
+    For Developers: The code blocks are very similar aside from the particulars of each class so only the item_object class
     writing and special map creation is commented properly.
     """  # these are docstrings for function, which come up on idle
 
@@ -52,7 +52,7 @@ def entities_to_CSV(PLAYER, ITEMS, MAPS, ENEMIES, INTERACT, QUESTS, GAMEINFO, GA
     f.close()
 
     # Map to CSV
-    mheader = ['Name', 'Description', 'x', 'y', 'z','dim', 'Item Inventory', 'Enemy Inventory',
+    mheader = ['Name', 'Description', 'x', 'y', 'z','dim', 'Item Inventory', 'enemy_object Inventory',
                'Place Description (will leave soon)', 'Inside', 'Wall locations', 'Interior Size', 'Travelled Flag',
                'Mapped Flag']
     with open(csvPath + "MAPS.csv", "wb") as f:
@@ -85,7 +85,7 @@ def entities_to_CSV(PLAYER, ITEMS, MAPS, ENEMIES, INTERACT, QUESTS, GAMEINFO, GA
         for Z in range(game_objects.ZRANGE):  # Each cross-section is a Z level
             writer.writerow(["This map is for display purposes only, editing will not do anything"])
             # Map prinout Constructor:
-            # This makes a 2 dimensional list of each item which will be filled with data later
+            # This makes a 2 dimensional list of each item_object which will be filled with data later
             crossSection = []  # map writer accumulator
             for X in range(XSize):  # makes the first set in X
                 crossSection.append([])
@@ -216,7 +216,7 @@ def csv_to_code():  # this file tries to autoatically update the save file
             next(reader)  # removing the header
             for row in reader:  # reads in a row of the CSV file as a list which each element is broken up to write
                 code = 'Equipment("' + row[0] + '", ('
-                if row[3] == "":  # if the item doesn't have a starting position sets it to none
+                if row[3] == "":  # if the item_object doesn't have a starting position sets it to none
                     code = code + "None"
                 else:
                     code = code + row[3] + ',' + row[4] + ',' + row[5]
@@ -233,7 +233,7 @@ def csv_to_code():  # this file tries to autoatically update the save file
         # TODO Would put the rest of the CSVs to write to code here
         STARTUP.close()
 
-    # Enemy("Connor the Biologist", "I would really like a cricket to continue my research...", (1, 7, 3), (10, 10, 10),
+    # enemy_object("Connor the Biologist", "I would really like a cricket to continue my research...", (1, 7, 3), (10, 10, 10),
     #       15, None, "cricket", "Thanks!", "'I can't believe you've done this."),
 
     return

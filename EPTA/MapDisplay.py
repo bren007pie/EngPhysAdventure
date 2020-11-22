@@ -3,7 +3,7 @@ This function is used for outputting/displaying the maps of the game
 
 """
 from GameFunctions import *  # importing the global dictionaries/values
-import game_objects_2018 as game_objects
+import game_objects_2017 as game_objects
 
 centreX, centreY, centreZ, centreDim = STARTLOCATION  # The centre of the map, used to define the ground level starting position
 
@@ -54,7 +54,7 @@ def mini():
 
     # Map Display Loop:
     if dimplayer != 0:
-        print(DIMENSIONS[dimplayer])  # Prints the interior name if they're not in the overworld
+        print(dimension_names[dimplayer])  # Prints the interior name if they're not in the overworld
     # Creates a row printout string and then prints each line from top to bottom. Z is constant for level player is on.
     for y in range(game_objects.YRANGE - 1, 0 - 1, -1):  # prints out the map from top to bottom to match player orientation
         # TODO make map rotatable for cardinal coordinates

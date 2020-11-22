@@ -1,8 +1,8 @@
 #This is the file used for most backend, interaction, startup/global variables,  functions of the game
 
 
-from GameClasses import *
-import game_objects_2018 as game_objects
+from game_classes import *
+import game_objects_2017 as game_objects  # Important as a name for game version polymorphism
 import AsciiArt
 import time
 import os  # used to put files in the cache folder
@@ -11,8 +11,10 @@ from Colour import *
 from sys import platform
 
 
+# ---- Game Dictionaries ----
 
-# This is where the global variables are instantiated and defined. Global variables used to pass info between functions
+# This is where the main game dictionaries (store all the game information are instantiated but are usually overwritten in setup.
+# You'll usually see these 8 dictionareis (beside gameinfo) passed between fucntions. This is passing the entire game state.
 # TODO will be changed to pass by reference) and dictionaries used to store many variables/objects in one
 #   place while making it clear in the code which one is being referenced
 
@@ -20,10 +22,17 @@ MAPS = game_objects.WorldMap()
 ITEMS = game_objects.ItemDictionary()
 ENEMIES = game_objects.EnemyDictionary()
 INTERACT = game_objects.InteractDictionary()
-DIMENSIONS = ["OverWorld", "BSB", "Capstone Room", "Green Lake", "Haunted Forest","Cabin in the Woods"]  # List of interior names with the index location being the dimension/building number
-# ex) 0 is OverwWord, 1 is BSB, 2 is capstone room, etc
 
+dimension_names = game_objects.dimension_names  # List of dimension names. Indexed by list location. If this gets too clumsy/too many dimensions will make it a dictionary.
+QUESTS = {}  #initializing the quests global variable to be later writen into
+PLAYER, DEVPLAYER = game_objects.PlayableCharacters(ITEMS)  # Passing in items so can setup default inventories
+STARTLOCATION = PLAYER.location  # start location defined for mapping, setup, etc
 
+# These settings are global and are in the settings.ini file so they don't need to be set every time you startup
+GAMESETTINGS = {'DisableOpening': 0, 'SpeedRun': 0, 'HardcoreMode':0}
+# disable openning, speedrun disables openning;lore read times; might disable secrets or opens them,
+# hardcore for now disables eating but might make enemies harder,
+# DevMode disables the main error catching + Startup Blip
 
 
 GAMEINFO = {'version':0,'versionname':"", 'releasedate':"",'playername':"",'gamestart':0,'timestart':0,
@@ -43,16 +52,16 @@ GAMEINFO['help'] = "(\S)The complexities of reality have been distilled into 4 t
                     "(\S) (\S)These are the commands your brain can handle in this state:" \
                     "(\S)-(s)search (look at what's around you)" \
                     "(\S)-(l,r,f,b,u,d)go left/right/front/back/up/down (you can't turn)" \
-                    "(\S)-(e)equip " +itemcolour+ "item" +textcolour+ " (picks them up into your inventory, replaces what you're wearing/holding)" \
-                    "(\S)-(dr)drop " +itemcolour+ "item" +textcolour+ " (removes them from your inventory)" \
-                    "(\S)-(ex)examine " +itemcolour+ "item" +textcolour+ "" \
-                    "(\S)-(ea)eat " +itemcolour+ "item" +textcolour+ "" \
+                    "(\S)-(e)equip " +itemcolour+ "item_object" +textcolour+ " (picks them up into your inventory, replaces what you're wearing/holding)" \
+                    "(\S)-(dr)drop " +itemcolour+ "item_object" +textcolour+ " (removes them from your inventory)" \
+                    "(\S)-(ex)examine " +itemcolour+ "item_object" +textcolour+ "" \
+                    "(\S)-(ea)eat " +itemcolour+ "item_object" +textcolour+ "" \
                     "(\S)-(i)inventory (check inventory)" \
                     "(\S)-(c)condition (Sees how you're doing)" \
-                    "(\S)-(ex)examine " +interactcolour+ "interact" +textcolour+ " (uses an item on the interacable when you have the right thing) " \
-                    "(\S)-(us)use " +itemcolour+ "item" +textcolour+ " (use an item on a nearby interactable)" \
-                    "(\S)-(t)talk " +personcolour+ "person" +textcolour+ "  (gives them an item when you have the right thing)" \
-                    "(\S)-(g)give " +itemcolour+ "item" +textcolour+ " (tries to give an object to a person around you)" \
+                    "(\S)-(ex)examine " +interactcolour+ "interact" +textcolour+ " (uses an item_object on the interacable when you have the right thing) " \
+                    "(\S)-(us)use " +itemcolour+ "item_object" +textcolour+ " (use an item_object on a nearby interactable)" \
+                    "(\S)-(t)talk " +personcolour+ "person" +textcolour+ "  (gives them an item_object when you have the right thing)" \
+                    "(\S)-(g)give " +itemcolour+ "item_object" +textcolour+ " (tries to give an object to a person around you)" \
                     "(\S)-(a)attack " +personcolour+ "person" +textcolour+ " (Force may be necessary but be careful, you're limited by what you have)" \
                     "(\S)-(r)remember (remember what you were doing here earlier)" \
                     "(\S)-exit (exit your body, " +indicatecolour+ "ALWAYS EXIT" +textcolour+ " or it " +losecolour+ "won't save" +textcolour+ "!)" \
@@ -62,44 +71,7 @@ GAMEINFO['help'] = "(\S)The complexities of reality have been distilled into 4 t
 
 
 
-QUESTS = {}  #initializing the quests global variable to be later writen into
 
-# These settings are global and are in the settings.ini file so they don't need to be set every time you startup
-GAMESETTINGS = {'DisableOpening': 0, 'SpeedRun': 0, 'HardcoreMode':0}
-# disable openning, speedrun disables openning;lore read times; might disable secrets or opens them,
-# hardcore for now disables eating but might make enemies harder,
-# DevMode disables the main error catching + Startup Blip
-
-
-STARTLOCATION = (2,3,1,0)
-STARTHEALTH = 100
-
-
-EMPTYHEAD = Equipment('EMPTY',(None,None,None),'EMPTY.png','Nothing is Equipped','head',(0,0,0),-101)
-EMPTYBODY = Equipment('EMPTY',(None,None,None),'EMPTY.png','Nothing is Equipped','body',(0,0,0),-101)
-EMPTYHAND = Equipment('EMPTY',(None,None,None),'EMPTY.png','Nothing is Equipped','hand',(0,0,0),-101)
-EMPTYOFFHAND = Equipment('EMPTY',(None,None,None),'EMPTY.png','Nothing is Equipped','off-hand',(0,0,0),-101)
-EMPTYINV = {'head':EMPTYHEAD,'body':EMPTYBODY,'hand':EMPTYHAND,'off-hand':EMPTYOFFHAND}
-STARTINV = {'head':EMPTYHEAD,'body':EMPTYBODY,'hand':EMPTYHAND,'off-hand':ITEMS["polaroid photograph"]}
-#STARTINV = {'head':ITEMS['gas mask'],'body':ITEMS['okons chainmail'],'hand':ITEMS['iron ring'],'off-hand':ITEMS['green bang bong']}
-
-# OBJECTS need to be UNIQUE so that the location doesn't get messed up when duplicate objects in the game
-TYINV = {'head':ITEMS["tyler's visor glasses"],'body':ITEMS["tyler's big hits shirt"],'hand':ITEMS["tyler's hulk hands"],'off-hand':ITEMS["tyler's green bang bong"]} #gets to have the Iron Ring when he graduates
-BRENSTARTLOCATION =  (0, 0, 0, 1)  # Dev start location
-# (4,0,0,4)  haunted forest
-# (2,3,1,0)  default location
-# EACH INVENTORY HAS TO BE UNIQUE
-#BRENINV = EMPTYINV  # THIS CAUSED GHOSTING AND DUPLICATION I THINK BECAUSE OF same referenced object
-BRENINV = {'head':EMPTYHEAD,'body':EMPTYBODY,'hand':EMPTYHAND,'off-hand':EMPTYOFFHAND}  # needs to be unique or else ghosting
-#BRENINV = {'head':ITEMS["tyler's visor glasses"],'body':ITEMS["tyler's big hits shirt"],'hand':ITEMS["tyler's hulk hands"],'off-hand':ITEMS["tyler's green bang bong"]} #gets to have the Iron Ring when he graduates
-
-
-# TODO Make PLAYER into PLAYERS a dictionary of playable characters objects
-PLAYER = Character('Minnick',list(STARTLOCATION),STARTHEALTH,STARTINV,EMPTYINV)
-Tyler = Character('Tyler Kashak',list(STARTLOCATION),999,TYINV,EMPTYINV)
-BREN007PIE = Character('Brendan Fallon',list(BRENSTARTLOCATION),999,BRENINV,EMPTYINV)
-# MAPS[6][1][1][0].placeItem(ITEMS["big hits shirt"]) #having these spawn the items in the map after should get rid of the wierd bug from having Tyler Kashak having them to start
-# MAPS[0][3][0][0].placeItem(ITEMS["hulk hands"])
 
 
 # --- Setting up Game Folder ---
@@ -155,12 +127,13 @@ def Equip(Item):  # Item is a string not an object
     dim = PLAYER.location[3]
     Place = MAPS[x][y][z][dim]
     if Item in ITEMS and list(ITEMS[Item].location) == PLAYER.location:  # if name of Item asked for in parser is in ITEMS dictionary
+
         # this is different than the equip method in the Character class for some reason
-        # Makes sure the item is dropped at the current location
+        # Makes sure the item_object is dropped at the current location
         # TODO Redo this drop and equip structure. Is dumb and can cause duplicates/ghosting
         drop = PLAYER.equip(ITEMS[Item])  # does the equip method on the player
-        Place.removeItem(ITEMS[Item])   # removes that item from the invoirnment
-        Place.placeItem(drop)  # places the drop if there's something to drop
+        Place.remove_item(ITEMS[Item])   # removes that item_object from the invoirnment
+        Place.place_item(drop)  # places the drop if there's something to drop
         ITEMS[Item].quest = True  # quest/inspect flag is true
 
     # other acceptations for weird requests
@@ -186,9 +159,9 @@ def Drop(Item):  # Item is a string not an object
     Place = MAPS[x][y][z][dim]
     if Item in ITEMS and list(ITEMS[Item].location) == PLAYER.location:
         # TODO Redo this drop and equip structure. Is dumb and can cause duplicates/ghosting
-        drop = PLAYER.drop(ITEMS[Item])  # the player drop method that will return the item dropped
-        Place.placeItem(drop)  # places the drop on the ground
-        # Same as equip function. 'None' passed to function if item doesn't exist
+        drop = PLAYER.drop(ITEMS[Item])  # the player drop method that will return the item_object dropped
+        Place.place_item(drop)  # places the drop on the ground
+        # Same as equip function. 'None' passed to function if item_object doesn't exist
 
     # other acceptations for weird requests
     elif Item in INTERACT and list(INTERACT[Item].location) == PLAYER.location: # Interacts
@@ -202,20 +175,23 @@ def Drop(Item):  # Item is a string not an object
 
 
 
-def Move(direction,DIRECTIONWORDS,DIRECTIONSHORTCUTS):
-    global MAPS
-    global PLAYER
-    global ENEMIES
-    global INTERACT
-    global ITEMS
-    bf = ENEMIES['brendan fallon']
+def Move(direction,DIRECTIONWORDS,DIRECTIONSHORTCUTS):  # Could do function wrappers but going to just pass functions
+    global PLAYER #The main character. player is an object instance of class character.
+    global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global MAPS #All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
+    global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class interact_object keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global QUESTS #Quest statuses. This is a dictionary of flags (1 or 0) for the status of the quest keyed by quest name.
+    global ENEMIES #All the npcs. This a dictionary of objects of class enemy_object keyed by their lowcase equipment name (item_object.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global GAMEINFO #Miscellaneous game info. Dictionary of all sorts of variables
+    global GAMESETTINGS # The game settings that are saved in the game
+
     x = PLAYER.location[0]
     y = PLAYER.location[1]
     z = PLAYER.location[2]
     dim = PLAYER.location[3]
     currentplace = MAPS[x][y][z][dim]  # Saving your current map location to a variable
     place = 0
-    # Direction parsing and redefining so that it matches walls
+    # Direction parsing and redefining so that it matches wall character
     if direction in DIRECTIONSHORTCUTS: pass  # Don't need to parse direction if a shortcut
     elif direction == 'up': direction = 'u'
     elif direction == 'down': direction = 'd'
@@ -230,6 +206,7 @@ def Move(direction,DIRECTIONWORDS,DIRECTIONSHORTCUTS):
     if direction not in currentplace.walls:
         # TODO Make these direction additions transformations (matrix transforms) that add to a tuple
         # These are the direction parsing so it moves the desired coordinates
+        # Do these update the player coordiantes?
         if direction == 'u': z += 1
         elif direction == 'd': z -= 1
         elif direction == 'f': y += 1
@@ -248,11 +225,11 @@ def Move(direction,DIRECTIONWORDS,DIRECTIONSHORTCUTS):
         for link in currentplace.links:  # if there is links in it it will loop through
             if direction in link:  # Searching all the links to see if any links refer to that direction
                 if dim == 0 and link[4] != 0:
-                    printT("You go inside " +mapcolour+ DIMENSIONS[link[4]] +textcolour+ ".")  # When going to non-Overworld it says going inside
+                    printT("You go inside " + mapcolour + dimension_names[link[4]] + textcolour + ".")  # When going to non-Overworld it says going inside
                 elif dim != 0 and link[4] == 0: # When going to overworld from non
                     printT("You go outside.")
                 elif dim != link[4]:  # Leaving one interior and entering another
-                    printT("You leave " +mapcolour+ DIMENSIONS[dim] +textcolour+ " and enter " +mapcolour+ DIMENSIONS[link[4]] +textcolour+ ".")
+                    printT("You leave " + mapcolour + dimension_names[dim] + textcolour + " and enter " + mapcolour + dimension_names[link[4]] + textcolour + ".")
 
                 x = link[1]
                 y = link[2]
@@ -260,26 +237,18 @@ def Move(direction,DIRECTIONWORDS,DIRECTIONSHORTCUTS):
                 dim = link[4]
                 place = MAPS[x][y][z][dim]  # Overwrites place with the link location
 
-
+    # -- This is the sucessfull movement function  --
     if place:
+        from game_scripts_2017 import move_script  # Important has to be in function to avoid global function recursion import error. I.E. can't just import gamescripts globally in gamefunctions.
+        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = move_script(place, MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # scripting interface
+
+        # This is where the player location gets updated if the place works!
         PLAYER.location[0] = x
         PLAYER.location[1] = y
         PLAYER.location[2] = z
         PLAYER.location[3] = dim
-        bfchance = 0.003
-        if PLAYER.inv['body'] == ITEMS['tony hawk shirt']:
-            bfchance += 0.007
-            #bfchance += 0.50  # TODO Remove this before final build
 
-
-        if bf.location != (None,None,None,None):
-            MAPS[bf.location[0]][bf.location[1]][bf.location[2]][bf.location[3]].removeEnemy(bf)
-        if random() <= bfchance:
-            printT(" (\S)You see A " +wincolour+ "BRENDAN FALLON" +textcolour +".")
-            MAPS[x][y][z][dim].placeEnemy(bf)
-            # AsciiArt.Hero()  # TODO Enable once Dynamic Ascii Art
-
-        place.search(MAPS, DIMENSIONS,GAMESETTINGS)  # searches and prints the place
+        place.search(MAPS, dimension_names, GAMESETTINGS)  # searches and prints the place
         return place  # idk why but this returns place and I'm keeping it here so yeah
 
 
@@ -345,41 +314,36 @@ def Combat(P,E):
         return 1
 
 def Attack(E):  # E is a string not an object
-    global ENEMIES
-    global MAPS
-    global PLAYER
-    global ITEMS
+    global PLAYER #The main character. player is an object instance of class character.
+    global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global MAPS #All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
+    global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class interact_object keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global QUESTS #Quest statuses. This is a dictionary of flags (1 or 0) for the status of the quest keyed by quest name.
+    global ENEMIES #All the npcs. This a dictionary of objects of class enemy_object keyed by their lowcase equipment name (item_object.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global GAMEINFO #Miscellaneous game info. Dictionary of all sorts of variables
+    global GAMESETTINGS # The game settings that are saved in the game
+
     x = PLAYER.location[0]
     y = PLAYER.location[1]
     z = PLAYER.location[2]
     dim = PLAYER.location[3]
     CurrentPlace = MAPS[x][y][z][dim]
     if E in ENEMIES and (list(ENEMIES[E].location) == PLAYER.location) and (ENEMIES[E].alive):
-        enemy = ENEMIES[E] #making it the object from the name
-        bgchance = 0.01
-        if PLAYER.inv['head'] == ITEMS['helm of orin bearclaw']:
-            bgchance += 0.10
-        if PLAYER.inv['body'] == ITEMS['big hits shirt']:
-            bgchance += 0.05
-        if PLAYER.name == "Big Hits Twofer":  # This is for testing big hits events
-            bgchance = 20
+        enemy = ENEMIES[E]  # making it the object from the name
 
-        if random() <= bgchance: #bigHits feature TODO have oblivion sound effects
-            # AsciiArt.BigHits()  # TODO Enable once Dynamic Ascii Art
-            printT(" (\S)An oblivion gate opens and a " +lightmagenta+"purple faced hero" +textcolour +" in " +lightblack+"ebony armour" +wincolour+ " punches " +personcolour+ enemy.name +textcolour+ " to death.")
-            printT(enemy.Dinfo) #slow version
-            enemy.alive = False
-            if enemy.drop:
-               printT(" (\S)" +enemy.colouredname+ " dropped the " + ITEMS[enemy.drop].colouredname + ".")
-               CurrentPlace.placeItem(ITEMS[enemy.drop])
-        else:
+        # -- Main Attack Function --
+        from game_scripts_2017 import attack_script  # Can't just import gamescripts globally in gamefunctions.
+        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = attack_script(enemy, MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # scripting interface
+
+
+        if enemy.alive and not (type(enemy) is Animal):  # accounts for if the enemy was killed in a scripted attack event and is not an animal
            Outcome = Combat(PLAYER,enemy)
            if Outcome:
                printT("You " +wincolour + "defeated " + enemy.colouredname + ". (\S)")
                printT(enemy.Dinfo)
                if enemy.drop:
                    printT( enemy.colouredname + " dropped a " + ITEMS[enemy.drop].colouredname + ".")
-                   CurrentPlace.placeItem(ITEMS[enemy.drop])
+                   CurrentPlace.place_item(ITEMS[enemy.drop])
            else:
                printT("Oh no! " + enemy.colouredname + " " +losecolour + "defeated" + textcolour+ " you! (\S)You died, without ever finding your " +wincolour+"iron ring" + textcolour +".")
 
@@ -410,17 +374,17 @@ def Talk(E):  # E is a string not an object
         if enemy.need and PLAYER.inv[ITEMS[enemy.need].worn]==ITEMS[enemy.need]and not enemy.quest:
             printT(enemy.colouredname + " took the " + ITEMS[enemy.need].colouredname+ ".")
             printT(enemy.Sinfo)  # default print speed
-            ITEMS[enemy.need].location = (None, None, None)  # Brendan added this, used to clear the item location
+            ITEMS[enemy.need].location = (None, None, None)  # Brendan added this, used to clear the item_object location
             PLAYER.inv[ITEMS[enemy.need].worn] = PLAYER.emptyinv[ITEMS[enemy.need].worn]
-            PLAYER.updateStats()
+            PLAYER.update_stats()
             enemy.quest = True
             if enemy.drop:
-                MAPS[x][y][z][dim].placeItem(ITEMS[enemy.drop])
+                MAPS[x][y][z][dim].place_item(ITEMS[enemy.drop])
                 printT("You see a " + ITEMS[enemy.drop].colouredname +". (\S)")
                 enemy.drop = None
         elif enemy.quest and enemy.drop:
             printT(enemy.Sinfo)
-            MAPS[x][y][z][dim].placeItem(ITEMS[enemy.drop])
+            MAPS[x][y][z][dim].place_item(ITEMS[enemy.drop])
             printT( "You see a " + ITEMS[enemy.drop].colouredname +". (\S)")
             enemy.drop = None
         elif enemy.quest:
@@ -471,7 +435,7 @@ def Stats():
         printT("DEF: " + str(PLAYER.stats[1]))
         printT("SPD: " + str(PLAYER.stats[2])+" (\S)")
 
-def Inspect(Item): #Item is the inspect item string not an object
+def Inspect(Item): #Item is the inspect item_object string not an object
     global MAPS
     global ITEMS
     global PLAYER
@@ -481,17 +445,19 @@ def Inspect(Item): #Item is the inspect item string not an object
     z = PLAYER.location[2]
     dim = PLAYER.location[3]
 
-    #If item in location
-    if Item in ITEMS and list(ITEMS[Item].location) == PLAYER.location: #this is for item = equipment
+    #If item_object in location
+    # TODO seperate examine functionality from using functionality
+    if Item in ITEMS and list(ITEMS[Item].location) == PLAYER.location: #this is for item_object = equipment
         printT("" + itemcolour+ ITEMS[Item].colouredname.upper() +textcolour + "",72,0)
         printT(ITEMS[Item].info,72,0)  # fast version for reading things
 
         ITEMS[Item].quest = True  # sets the quest/inspected flag to true
-        # TODO re-implement inspecting item with words instead of numbers
+        # TODO re-implement inspecting item_object with words instead of numbers
         deltaATK = ITEMS[Item].stats[0]-PLAYER.inv[ITEMS[Item].worn].stats[0]  # " more powerful"
         deltaDEF = ITEMS[Item].stats[1]-PLAYER.inv[ITEMS[Item].worn].stats[1]  # " better defended"
         deltaSPD = ITEMS[Item].stats[2]-PLAYER.inv[ITEMS[Item].worn].stats[2]  # " faster"
 
+        # -- The text based description of items comapred to your current equiped item_object --
         descriptornumbers = [5,10,25,50,100,1000]
         descriptors = ["Slightly", lightblack+"A good bit", lightblue+"A significant amount",red+"A very large amount", lightwhite+"A very very large amount", lightyellow +"AN UNGODLY amount"]
         #5 = a bit
@@ -529,20 +495,21 @@ def Inspect(Item): #Item is the inspect item string not an object
                 printT( "Eaten Health: " + str(ITEMS[Item].health) + " (\S)") #+ str(ITEMS[Item].health) + " (" + str(min(100,PLAYER.health + ITEMS[Item].health))+")" +"\n"
             else:
                 print("")
-    # If the entered item is an intractable and is at that location
-    elif Item in INTERACT and list(INTERACT[Item].location) == PLAYER.location:  # this is for item = interactable
+    # If the entered item_object is an intractable and is at that location
+
+    elif Item in INTERACT and list(INTERACT[Item].location) == PLAYER.location:  # this is for item_object = interactable
         # TODO Have Interactables be able to use lists (to drop multiple things), tuples(to place unique objects)
-        if INTERACT[Item].need and (PLAYER.inv[ITEMS[INTERACT[Item].need].worn]==ITEMS[INTERACT[Item].need] or ITEMS[INTERACT[Item].need] in MAPS[x][y][z][dim].items): #if you're wearing item.need or it's on the ground the interactable needs worn on your body
+        if INTERACT[Item].need and (PLAYER.inv[ITEMS[INTERACT[Item].need].worn]==ITEMS[INTERACT[Item].need] or ITEMS[INTERACT[Item].need] in MAPS[x][y][z][dim].items): #if you're wearing item_object.need or it's on the ground the interactable needs worn on your body
             if PLAYER.inv[ITEMS[INTERACT[Item].need].worn]==ITEMS[INTERACT[Item].need]:  # if in the players hand
                 PLAYER.inv[ITEMS[INTERACT[Item].need].worn] = PLAYER.emptyinv[ITEMS[INTERACT[Item].need].worn]
             elif ITEMS[INTERACT[Item].need] in MAPS[x][y][z][dim].items:  # if around the area
-                MAPS[x][y][z][dim].removeItem(ITEMS[INTERACT[Item].need])
+                MAPS[x][y][z][dim].remove_item(ITEMS[INTERACT[Item].need])
                 ITEMS[INTERACT[Item].need].location = (None,None,None,None)
-            INTERACT[Item].quest = True  # this turns on the quest flag for the interactable once interacted with if you have the item
+            INTERACT[Item].quest = True  # this turns on the quest flag for the interactable once interacted with if you have the item_object
             printT("" +interactcolour+ INTERACT[Item].colouredname.upper() +textcolour+ "" ,72,0)  # Due to the upper it removes the colour
             printT(INTERACT[Item].Sinfo + "(\S)",72,0)  # special slow version
-            PLAYER.updateStats()  # TODO stats should automatically update whenver player state is changed
-            ITEMS[INTERACT[Item].need].location=(None,None,None) # Brendan added this, used to clear the item location
+            PLAYER.update_stats()  # TODO stats should automatically update whenver player state is changed
+            ITEMS[INTERACT[Item].need].location=(None,None,None) # Brendan added this, used to clear the item_object location
             if INTERACT[Item].drop:
                 INTERACT[Item].drop_objects(Item,x,y,z,dim,MAPS,ITEMS,INTERACT,ENEMIES)  # drops the proper object
 
@@ -613,14 +580,14 @@ def Eat(Item):  # Item is a string not an object
             if GAMEINFO['devmode']: printT(" (\S)HEALTH: "+ str(PLAYER.health)+ " (\S)")  # if in DevMode can see stats
             if PLAYER.health == 0:
                 PLAYER.alive = False
-            ITEMS[Item].location = (None, None, None) #used to clear the item location
+            ITEMS[Item].location = (None, None, None) #used to clear the item_object location
             if ITEMS[Item] == PLAYER.inv[ITEMS[Item].worn]:
                 PLAYER.inv[ITEMS[Item].worn] = PLAYER.emptyinv[ITEMS[Item].worn]
                 ITEMS[Item].location = (None, None, None)
-                PLAYER.updateStats()
+                PLAYER.update_stats()
                 printT("The " + ITEMS[Item].colouredname + " has been removed from your inventory. (\S)")
             else:
-                MAPS[x][y][z][dim].removeItem(ITEMS[Item])
+                MAPS[x][y][z][dim].remove_item(ITEMS[Item])
         else:
             printT("You can't eat a " + ITEMS[Item].colouredname + "!")
 
@@ -651,11 +618,11 @@ def logGame(log): #this makes a log file which records all player actions for de
 
 def NameChange(playername):  # A dumb backend workaround to change the players name. TODO other strategies could have startup instantatied after name is defined
     global PLAYER  # The main character. player is an object instance of class character.
-    global ITEMS  # All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global ITEMS  # All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global MAPS  # All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
-    global INTERACT  # All the interactables (stationary things that need something). This a dictionary of objects of class Interact keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global INTERACT  # All the interactables (stationary things that need something). This a dictionary of objects of class interact_object keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global QUESTS  # Quest statuses. This is a dictionary of flags (1 or 0) for the status of the quest keyed by quest name.
-    global ENEMIES  # All the npcs. This a dictionary of objects of class Enemy keyed by their lowcase equipment name (item.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global ENEMIES  # All the npcs. This a dictionary of objects of class enemy_object keyed by their lowcase equipment name (item_object.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global GAMEINFO  # Miscellaneous game info. Dictionary of all sorts of variables
     global GAMESETTINGS  # The game settings that are saved in the game
     # ENEMIES['yourself'].name = playername
@@ -675,9 +642,9 @@ def NameChange(playername):  # A dumb backend workaround to change the players n
         #ENEMIES.update({PLAYER.name.lower():ENEMIES['yourself']}) # adds that new entity to the dictionary
 
         ENEMIES[playername.lower()].location = (2, 4, 1, 0)
-        MAPS[2][4][1][0].placeEnemy(ENEMIES[playername.lower()])  # then placed on the map
+        MAPS[2][4][1][0].place_enemy(ENEMIES[playername.lower()])  # then placed on the map
         ENEMIES[playername.lower() + "'s dad"].location = (5, 7, 1, 0)
-        MAPS[5][7][1][0].placeEnemy(ENEMIES[playername.lower() + "'s dad"])  # then placed on the map
+        MAPS[5][7][1][0].place_enemy(ENEMIES[playername.lower() + "'s dad"])  # then placed on the map
 
         #TODO problem is that allkeys are not updated for spellchecking
 
@@ -712,11 +679,11 @@ def DisplayTime(value): # converts and displays the time given seconds, for spee
 def save_game(savename):
     # These are all the global dictionaries/objects in the game. Anywhere where a loadgame happens you need all the global variables
     global PLAYER #The main character. player is an object instance of class character.
-    global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global MAPS #All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
-    global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class Interact keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class interact_object keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global QUESTS #Quest statuses. This is a dictionary of flags (1 or 0) for the status of the quest keyed by quest name.
-    global ENEMIES #All the npcs. This a dictionary of objects of class Enemy keyed by their lowcase equipment name (item.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global ENEMIES #All the npcs. This a dictionary of objects of class enemy_object keyed by their lowcase equipment name (item_object.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global GAMEINFO #Miscellaneous game info. Dictionary of all sorts of variables
     global GAMESETTINGS # The game settings that are saved in the game
     # global keyword makes the variables inside the function reference the correct global scope variable when assigned in the function.
@@ -743,11 +710,11 @@ def save_game(savename):
 def load_game(loadname):
     # These are all the global dictionaries/objects in the game. Anywhere where a loadgame happens you need all the global variables
     global PLAYER #The main character. player is an object instance of class character.
-    global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global MAPS #All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
-    global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class Interact keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class interact_object keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global QUESTS #Quest statuses. This is a dictionary of flags (1 or 0) for the status of the quest keyed by quest name.
-    global ENEMIES #All the npcs. This a dictionary of objects of class Enemy keyed by their lowcase equipment name (item.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global ENEMIES #All the npcs. This a dictionary of objects of class enemy_object keyed by their lowcase equipment name (item_object.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global GAMEINFO #Miscellaneous game info. Dictionary of all sorts of variables
     global GAMESETTINGS # The game settings that are saved in the game
     # global keyword makes the variables inside the function reference the correct global scope variable when assigned in the function.
@@ -772,7 +739,7 @@ def load_game(loadname):
     GAMEINFO['timestart'] = time.time()  # reset instance start time
 
     x,y,z,dim = PLAYER.location
-    MAPS[x][y][z][dim].search(MAPS,DIMENSIONS,GAMESETTINGS,True)
+    MAPS[x][y][z][dim].search(MAPS, dimension_names, GAMESETTINGS, True)
 
     # HAVE TO HAVE THESE RETURN INTO THE SCOPE. I HATE GLOBAL VARIABLES ONLY USE PASS BY VALUE EVER
     return MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS

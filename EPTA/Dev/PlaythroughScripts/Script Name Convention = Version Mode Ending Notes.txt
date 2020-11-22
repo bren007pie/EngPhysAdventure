@@ -1,3 +1,7 @@
+use underscores as space
+all lowercase
+version_mode_ending_notes.txt
+
 DEV = DEVMODE
 VAN = Vanilla regular mode (no secrets, but sidequests allowed)
 SEC = Vanilla with secrets

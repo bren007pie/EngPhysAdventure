@@ -53,7 +53,7 @@ Drop:
 Move:
 Attack:
 Talk:
-Inspect/Interact:
+Inspect/interact_object:
 Open
 Examine
 Read
@@ -154,11 +154,11 @@ shortcutprint = "Shortcuts(\S)blank space = look around/search(\S)a = attack(\S)
 def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):
     # # These are all the global dictionaries/objects in the game. Anywhere where a loadgame happens you need all the global variables
     # global PLAYER #The main character. player is an object instance of class character.
-    # global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    # global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     # global MAPS #All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
-    # global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class Interact keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    # global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class interact_object keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     # global QUESTS #Quest statuses. This is a dictionary of flags (1 or 0) for the status of the quest keyed by quest name.
-    # global ENEMIES #All the npcs. This a dictionary of objects of class Enemy keyed by their lowcase equipment name (item.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    # global ENEMIES #All the npcs. This a dictionary of objects of class enemy_object keyed by their lowcase equipment name (item_object.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
     # global GAMEINFO #Miscellaneous game info. Dictionary of all sorts of variables
     # global GAMESETTINGS # The game settings that are saved in the game
     # # global keyword makes the variables inside the function reference the correct global scope variable when assigned in the function.
@@ -198,7 +198,7 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
         elif verb in [ 's','search', 'look']:
             x, y, z, dim = PLAYER.location
             print(MAPS[x][y][z][dim].name)
-            MAPS[x][y][z][dim].search(MAPS, DIMENSIONS,GAMESETTINGS)
+            MAPS[x][y][z][dim].search(MAPS, dimension_names, GAMESETTINGS)
 
         # TODO if word based description: re-enable stats and remove from DEVVERBs
         elif verb in ['c','stats','status','condition']:
@@ -228,14 +228,16 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
         # Now at least for normal people you can't metagame by saving and loading files
         elif verb in ['exit', 'leave', 'quit', "die"]:
             # A FULL Copy of /savegame function bassically
-            if input("\n\nAre you sure you want to save and " +losecolour+ "quit" +textcolour+ " the game?\nType Y if you wish to save and leave,\nanythine else to continue: \n").lower() in ["y", 'yes', 'yeah']:
+            printT(" (\S)Are you sure you want to save and " +losecolour+ "quit" +textcolour+ " the game? Type Y if you wish to save and leave, anythine else to continue:")
+            if input("").lower() in ["y", 'yes', 'yeah']:
                 GAMEINFO['runtime'] += (time.time() - GAMEINFO['timestart'])  # adds the runtime (initilized to zero) to the session runtime to make the total runtime
                 GAMEINFO['timestart'] = time.time()  # resets timestart so it's not doubly added at the end
                 logGame(GAMEINFO['log'])  # logs the game when you save it
                 save_game(GAMEINFO['playername'])  # saves all data
                 # print "Your game has been saved! " + GAMEINFO['playername']  # Don't indicate the save file has save file in the name
                 AsciiArt.ThanksForPlaying()
-                input("" +indicatecolour+ "We're sad to see you go :(" +textcolour+ " \nI hope whatever you're doing is more fun.\nPress anything to leave")
+                printT("" +indicatecolour+ "We're sad to see you go :(" +textcolour+ " (\S)I hope whatever you're doing is more fun. Press anything to leave")
+                input("")
                 exit()
         elif verb in ['re',"remember", "recall","lore"]:
             x, y, z, dim = PLAYER.location
@@ -443,7 +445,7 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
 
         elif verb == "look" and objectName == "around":  # used just for look around case. Has to be above inspect conditional so it triggers first
             x, y, z, dim = PLAYER.location
-            MAPS[x][y][z][dim].search(MAPS, DIMENSIONS,GAMESETTINGS)
+            MAPS[x][y][z][dim].search(MAPS, dimension_names, GAMESETTINGS)
 
         elif verb in ['ex','inspect', 'examine','read', 'open', 'look']:
             Inspect(objectName)
@@ -462,7 +464,7 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
             Equip(objectName)  # Equipts it
         elif verb in ['us','use']:  # this makes it so you can use items if the interacble is in the area
             x, y, z, dim = PLAYER.location
-            # checks all interactables in area to see if item is needed
+            # checks all interactables in area to see if item_object is needed
             surroundingobjects = [PLAYER.inv['head'], PLAYER.inv['body'], PLAYER.inv['hand'], PLAYER.inv['off-hand']] \
                                  + MAPS[x][y][z][dim].items + MAPS[x][y][z][dim].ENEMY
             match = False
@@ -480,7 +482,7 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
                 printT(" (\S)You can't find a " + objectName + " around here. Maybe it's your hungover brain.")
         elif verb in ['g','give']:
             x, y, z, dim = PLAYER.location
-            # checks all Enemies in area to see if item is needed
+            # checks all Enemies in area to see if item_object is needed
             surroundingobjects = [PLAYER.inv['head'], PLAYER.inv['body'], PLAYER.inv['hand'], PLAYER.inv['off-hand']] \
                                  + MAPS[x][y][z][dim].items + MAPS[x][y][z][dim].ENEMY
             match = False

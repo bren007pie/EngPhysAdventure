@@ -25,6 +25,7 @@ from Colour import coloursusedlist
     #and can define their window character size (small-med-large) for text reading
 # TODO put delay back to 2.0 seconds before game release
 # TODO Make an alignment option so can align to left, centre, or right side of screen
+# TODO Add game settings so prinT will remove colour
 def printT(text, char=72, delay = 2): #3 second delay seems to be optimal new reading speed for me, 2 kinda fast and 4 kinda slow
     """TIPS: Use (\S) for newline & resets paragraph, (\S) (\S) for space with pause, paragraph every punctuation 5 marks 
     This function removes newlines from our old text then prints out each line to the chacter limit and with delays inbetween
@@ -34,7 +35,7 @@ def printT(text, char=72, delay = 2): #3 second delay seems to be optimal new re
     """#these are docstrings for function, which come up on idle
 
     # If speed run is enabled this will override the text delay and make it 0 for all outputs
-    from GameFunctions import GAMESETTINGS,GAMEINFO  # Imports game settings, hopefully to avoid import problems
+    from GameFunctions import GAMESETTINGS,GAMEINFO  # Imports game settings, hopefully to avoid import problems, wait, you can import inside functions?
     if GAMESETTINGS['SpeedRun'] or GAMEINFO['devmode']:  # If either mode there is no text delay
         delay = 0
     

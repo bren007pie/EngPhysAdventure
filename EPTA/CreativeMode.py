@@ -3,7 +3,7 @@
 #Wrote on Dec  22,2018: 
 import pickle
 from GameFunctions import * #importing the global dictionaries/values
-import game_objects_2018 as game_objects
+import game_objects_2017 as game_objects
 import CSVSaves
 from Colour import *
 
@@ -69,8 +69,8 @@ from Colour import *
 #         # for info in GAMEINFO: #when itterating through list the itterating variable is the string of the key
 #         #     GAMEINFO[info] = loadinfo[info]
 #         # PLAYER.__dict__ = loadplayer.__dict__
-#         # for item in ITEMS:
-#         #     ITEMS[item].__dict__ = loaditems[item].__dict__ #assignment better when no subitems? .__dict for when there is
+#         # for item_object in ITEMS:
+#         #     ITEMS[item_object].__dict__ = loaditems[item_object].__dict__ #assignment better when no subitems? .__dict for when there is
 #         # for enemy in ENEMIES:  #.__dict__ removed on these and it works?
 #         #     ENEMIES[enemy].__dict__ = loadenemy[enemy].__dict__
 #         # for inter in INTERACT:
@@ -101,7 +101,7 @@ from Colour import *
 #         printT("========================================================================")
 #
 #         # searches and prints the information with spawn set to true to print "You wake up in"
-#         CurrentPlace.search(MAPS, DIMENSIONS,True)
+#         CurrentPlace.search(MAPS, dimension_names,True)
 #
 #         #YOU HAVE TO USE THIS DARN .__dict___ thing to copy the object atributes https://stackoverflow.com/questions/36243488/how-can-i-overwrite-an-object-in-python
 #         #This is ineffecient but works. I think main problem I had is loading where the loaded objects are a new memory location but the game still references old locations
@@ -119,7 +119,7 @@ from Colour import *
 #         printT("There is a mismatch between the objects in the game. You don't need to do anything but the game may not have loaded properly! We're sorry for any inconvenience.")
 #         printT("At this time we can't update the file. Some things might be broken")
 #         x, y, z, dim = PLAYER.location
-#         MAPS[x][y][z][dim].search(MAPS, DIMENSIONS,True)
+#         MAPS[x][y][z][dim].search(MAPS, dimension_names,True)
 #
 #         return PLAYER, ITEMS, MAPS, ENEMIES, INTERACT, QUESTS, GAMEINFO, GAMESETTINGS
 #
@@ -131,7 +131,7 @@ from Colour import *
 #
 #         #updateSave(save), function isn't done
 #         x, y, z, dim = PLAYER.location
-#         MAPS[x][y][z][dim].search(MAPS, DIMENSIONS,True)
+#         MAPS[x][y][z][dim].search(MAPS, dimension_names,True)
 #         return PLAYER,ITEMS,MAPS,ENEMIES,INTERACT,QUESTS,GAMEINFO, GAMESETTINGS
 
 
@@ -183,11 +183,11 @@ def creative_parser(command):
 #     print command
 #     # Going to go:
 #     # / Commandtype Classtype /Noun/ (/ / so can be multiword without needing context) Attribute/Method(make sure all only 1 word) /Value/ (/ / if string, nothing if int/float/bool)
-#     # ex) / Set Enemy /Dr. Minnick/ sinfo /WHO THE HELL ARE YOU/
+#     # ex) / Set enemy_object /Dr. Minnick/ sinfo /WHO THE HELL ARE YOU/
 #     # Does it one section at a time, splits left by two spaces gets first two words
 #     # Splits around / / characters to get the rest
 #
-#     #testline = "Set Enemy /Dr. Minnick/ sinfo /WHO THE HELL ARE YOU/"
+#     #testline = "Set enemy_object /Dr. Minnick/ sinfo /WHO THE HELL ARE YOU/"
 #
 #     # Parser WILL BE DIFFERENT FOR EACH COMMAND based on what is needed
 #     # Seperating the first 2 spaces to get first two words
@@ -229,7 +229,7 @@ def creative_parser(command):
 
 # Read
 # read attributes
-#/ex) / read Enemy /Dr. Minnick/ attack
+#/ex) / read enemy_object /Dr. Minnick/ attack
 # def creative_read(classtype, )
 #     attribute = slashseperate[1].lower()
 #     value = slashseperate[2].lower()
@@ -239,19 +239,19 @@ def creative_parser(command):
 
 # Set
 #set attributes
-#/Set Enemy /Alex Jones/ info /I"M COMMIN/
+#/Set enemy_object /Alex Jones/ info /I"M COMMIN/
 
 # New
 # creates a new base object
-#/ Create Enemy Dr. Minnick2.0
+#/ Create enemy_object Dr. Minnick2.0
 
 # Spawn
 # gives you a copy of that object at that location
-#/ Spawn item msp430
+#/ Spawn item_object msp430
 
 # Remove
 # Removes ALL of given ellement in the game at the time
-#/ Remove Enemy Dr. Minnick
+#/ Remove enemy_object Dr. Minnick
 
 # needs to be error checking if that ellement doesn't exist, but will be no spellchecking
 

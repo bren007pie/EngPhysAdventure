@@ -12,16 +12,18 @@
 - [ ] Can't play as tyler Kashak after you stop
 - [ ] When you exit from the start screen or otherwise the error catcher catches you
 - [ ] Check to make sure nest game, correct times, and everything add up
+- [ ] Die after winning the game you still get the credits and win dialog, AND THEN CONTINUE. Okay that's bad. - 0.30 Nov. 22, 2020
 
-# **Fixed Bugs**
-**Includes Date, bug, and bug fix**
+
 
         
 
 # 0.31 Anniversary update
 - [x] Attempt to see if you can get different modules to import conditionally - Nov. 19, 2020
-- [ ] Seperate all hard-coded objects to completly seperate the game engine and game
+- [x] Seperate all hard-coded objects to completly seperate the game engine and game
 - [ ] Create selector to select year and import properly
+- [ ] Playtest origional version of the game
+
 - [ ] Attempt to run EPTA in future versions of the game
 
 - 2017 = 2017-2018 Eng Phys Text Adventure (Origional Game)
@@ -29,9 +31,30 @@
 - 2019 = 2019-2020
 - 2020 = 2020-2021 COVID Text Adventure  (Hollywood)
 
+# 0.32 Nevada Engine Refactor
+- [ ] Properly rewrite gamefunctions into gameclasses, year them, and maybe even remove script interfaces. 
+        Rename gamefunctions to enginefucntions
+- [ ] Everything should be in the main loop
+- [ ] All objects/save files shouldn't be script based. Should be file based.
+- [ ] Redo Map into adjacency lists
+- [ ] Objects for interfaces
+- [ ] Maybe do component game objects for all game_objects.
+
+
+
 
 # Done so Far
+- Seperated game objects and gamescripts from old version
+- Adding scriptting functions to further encapsulate the game engine and game code
+- Added killing BF acheivement
+- Added not being able to attack an animal. BH punches you.
 
+# **Fixed Bugs**
+**Includes version, date, bug, and bug fix**
+- 0.30 Nov 22, 2020: If you kill BF his dead course follows you around. This is actually hilarious so I left it in. No fix
+- If you die after beating the game you can keep replaying so you're pretty much invincible. 
+LOL I don't care 2017, it was finished so not fixing. If you beat the game you get to be invincible XD
+- In Python3 input can't take ANSII escape characters so had to fix all those
 
 # Things to Read
 * https://dzone.com/articles/python-thread-part-1

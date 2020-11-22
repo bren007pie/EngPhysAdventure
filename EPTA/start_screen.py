@@ -8,11 +8,11 @@ from GameFunctions import *  # used for save file loading
 from printT import *
 from Colour import *
 import AsciiArt
+from Ascii_Art.Animations.NevadaAnimation import nevada_animation  # This is relative imports using relitive notation
 
 
 from GameFunctions import GAMESETTINGS, GAMEINFO # imports these global variables to be used in the start screen
 
-DELAY = 1.5
 # TODO Implement these based on the size of the screen
 #LINEBREAK = "========================================================================" #standard display with 72 characters
 LINEBREAK = "=======================The=Eng=Phys=Text=Adventure=======================" #standard display with 72 characters
@@ -26,11 +26,11 @@ LINEBREAK = "=======================The=Eng=Phys=Text=Adventure=================
 def StartScreen():
     # These are all the global dictionaries/objects in the game. Anywhere where a loadgame happens you need all the global variables
     global PLAYER  # The main character. player is an object instance of class character.
-    global ITEMS  # All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global ITEMS  # All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global MAPS  # All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
-    global INTERACT  # All the interactables (stationary things that need something). This a dictionary of objects of class Interact keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global INTERACT  # All the interactables (stationary things that need something). This a dictionary of objects of class interact_object keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global QUESTS  # Quest statuses. This is a dictionary of flags (1 or 0) for the status of the quest keyed by quest name.
-    global ENEMIES  # All the npcs. This a dictionary of objects of class Enemy keyed by their lowcase equipment name (item.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global ENEMIES  # All the npcs. This a dictionary of objects of class enemy_object keyed by their lowcase equipment name (item_object.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global GAMEINFO  # Miscellaneous game info. Dictionary of all sorts of variables
     global GAMESETTINGS  # The game settings that are saved in the game
     # global keyword makes the variables inside the function reference the correct global scope variable when assigned in the function.
@@ -60,15 +60,25 @@ def StartScreen():
         time.sleep(3)  # Delay for intro sound
         print(CLEARSCREEN)
 
+        # -- Nevada Animation --
+        nevada_animation(os.path.join(os.getcwd(), "MediaAssets", "", "ILLUMINATILiMEDcut.mp3"))
+
+
+
 
     startmenu = True  # startmenu is the variable that keeps you in the startmenu screen loop
 
     if GAMEINFO['devmode']:  # If in DevMode it skips the loading screen
         startmenu = False  # turning off loading screen
 
+    # TODO: Add something where you get special music when you play after beating the game? Idk. After getting acheivements. Really can't make this w.o. music control
+    # elif GAMESETTINGS['SpeedRun']:  # if speedrunning the game get some nice music because skipping the credit roll. If not then yeah
+    #     NoWorries = os.path.join(os.getcwd(), "MediaAssets","","NoWorries.mp3") #points to the eddited star wars theme
+    #     playsound.playsound(NoWorries, False) # plays the startup sound with 'multi-threading'
+
     while startmenu:
         print("       ___________                __________.__")
-        print("       \_   _____/    _     _____ \______   \  |__ ___.__. ______")
+        print("       \_   _____/ ____     _____ \______   \  |__ ___.__. ______")
         print("        |    __)_ /    \  / ___  > |     ___/  |  \   |  |/  ___/")
         print("        |        \   |  \/ /_/  /  |    |   |      \___  |\___ \ ")
         print("       /_______  /___|  /\___  /   |____|   |___|  / ____/____  >")
@@ -216,108 +226,6 @@ def StartScreen():
 
     return MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS
 
-def Opening():
-    #IT WORKS!
-    audiopath = os.path.join(os.getcwd(), "MediaAssets","","StarWarsOpenningFadeOut.mp3") #points to the eddited star wars theme
-    playsound.playsound(audiopath, False) #plays the sound with 'multithreading'
-    time.sleep(0.5)
-    print(CLEARSCREEN)
-    print("                " + magenta + "A" + textcolour + "____ ________")
-    print("                /_  H|\_____  \ ")
-    print("                 |  O|  ___|  |")
-    print("                 |  L| /___   <")
-    print("                 |  L|  ___\   |")
-    print("                 |  Y| /W O O D|")
-    print("                 |___|/________/")
-    print("                      " + magenta + "Production." + textcolour + "")
-    time.sleep(3.5) #4 seconds
-    print(CLEARSCREEN)
-    print("")
-    print("         A short time ago on a campus not so far,")
-    print("         far away....\n")
-    time.sleep(3) #5.5 seconds
-    print(CLEARSCREEN)
-    print() 
-    print("___________                __________.__")                 
-    print("\_   _____/ " +red+ "THE_GREAT" +textcolour+ "_____ \______   \  |__ ___.__. ______")
-    print(" |    __)_ /    \  / ___  > |     ___/  |  \   |  |/  ___/")
-    print(" |        \   |  \/ /_/  /  |    |   |      \___  |\___ \ ")
-    print("/_______  /___|  /\___  /   |____|   |___|  / ____/____  >")
-    print("        \/     \//_____/  " +red+ "TEXT ADVENTURE" +textcolour+ "  \/\/ (v4.20) \/ ")
-    time.sleep(7.5)
-    print("")
-    print("T h e  c a m p u s  i s  i n  a  s t a t e  o f  u n r e s t.")
-    time.sleep(DELAY)
-    print("A n  " +indicatecolour+ "a n c i e n t  f o r c e" +textcolour+ "  h a s  b e e n  a w o k e n")
-    time.sleep(DELAY)
-    print("a f t e r  t h e  e v e n t s  o f  a  d e b a u c h e r o u s")
-    time.sleep(DELAY)
-    print("e v e n i n g  a t  t h e  " +mapcolour+ "P h o e n i x" +textcolour+ ".\n")
-    time.sleep(DELAY*2)
-    print("T h e  h e r o  a w a k e n s  i n  " +mapcolour+ "f r o n t  o f  J H E" +textcolour+ "")
-    time.sleep(DELAY)
-    print("w i t h  a  c o n s i d e r a b l e  h e a d a c h e  b u t")
-    time.sleep(DELAY)
-    print("w i t h o u t  t h e i r  " +itemcolour+ "I R O N  R I N G" +textcolour+ ".\n")
-    time.sleep(DELAY*2)
-    print("C l u e s  a b o u t  l a s t  n i g h t  l i t t e r  t h e")
-    time.sleep(DELAY)
-    print("c a m p u s.  N o  s t o n e  c a n  b e  l e f t  u n t u r n e d.")
-    time.sleep(DELAY)
-    print("I t  w i l l  t r u l y  b e  a  t e s t  o f  s k i l l  a s")
-    time.sleep(DELAY)
-    print("w e l l  a s  w i t s  t o  s o l v e  t h i s  m y s t e r y.\n")
-    time.sleep(DELAY*2)
-    print("T h e  h e r o  m u s t  u n c o v e r  t h e  t r u t h")
-    time.sleep(DELAY)
-    print("a b o u t  l a s t  n i g h t  i f  t h e y  a r e  t o")
-    time.sleep(DELAY)
-    print("h a v e  a n y  h o p e  o f  r e t r i e v i n g  t h e i r")
-    time.sleep(DELAY)
-    print("" +itemcolour+ "I R O N  R I N G" +textcolour+ "  a n d  r e t u r n i n g  b a l a n c e")
-    time.sleep(DELAY)
-    print("t o  t h e  f a c u l t y.\n")
-    time.sleep(DELAY)
-    #print CLEARSCREEN  #Don't clearscreen at end so people can read!
-    # for i in range(14):
-    #     print "\n"
-    #     time.sleep(DELAY/2)
-
-def Closing():
-    print("\nAnd so, the "+wincolour+"fate" +textcolour+ " of "+mapcolour+"McMaster" +textcolour+ " has been decided...")
-    time.sleep(DELAY)
-    print("Our hero has unlocked the "+wincolour+"secrets" +textcolour+ " of "+mapcolour+"McMaster University" +textcolour+ "")
-    time.sleep(DELAY)
-    print("and "+wincolour+"lived" +textcolour+ " to tell the tale.\n")
-    time.sleep(DELAY)
-    print("___________                __________.__")
-    print("\_   _____/ " +red+ "THE_GREAT" +textcolour+ "_____ \______   \  |__ ___.__. ______")
-    print(" |    __)_ /    \  / ___  > |     ___/  |  \   |  |/  ___/")
-    print(" |        \   |  \/ /_/  /  |    |   |      \___  |\___ \ ")
-    print("/_______  /___|  /\___  /   |____|   |___|  / ____/____  >")
-    print("        \/     \//_____/  " +red+ "TEXT ADVENTURE" +textcolour+ "  \/\/ (v4.20) \/ \n")
-    time.sleep(DELAY)
-    print("Created by:\n"+red+"Brendan Fallon" +textcolour+ ", " +white+ "Tyler Kashak" +textcolour+ ", and " +lightblue+ "Mitchell Lemieux" +textcolour+ ".  \n")
-    time.sleep(DELAY)
-    printT("" +lightmagenta+ "Special Thanks:" +textcolour+ "\n" +personcolour+ "Erik" +textcolour+ " and " +personcolour+ "Phil" +textcolour+ " our best " +indicatecolour+ "playtesters" +textcolour+ "! There are no " +wincolour+ "better quality checkers" +textcolour+ " than you guys. (\S)")
-    time.sleep(DELAY/2)
-    print("Also thanks to Eric, Brian, Liam, and Megan.\n")
-    time.sleep(DELAY)
-    print("                " + red + "A" + textcolour + "____ ________")
-    print("                /_  H|\_____  \ ")
-    print("                 |  O|  ___|  |")
-    print("                 |  L| /___   <")
-    print("                 |  L|  ___\   |")
-    print("                 |  Y| /W O O D|")
-    print("                 |___|/________/")
-    print("                      " + red + "Production." + textcolour + "")
-    time.sleep(2)
-    printT("This is a work of fiction. Names, characters, businesses, places, events, locales, and incidents are "
-           "either the products of the author's imagination or used in a fictitious manner. Any resemblance to actual "
-           "persons, living or dead, or actual events is purely coincidental. (\S)",72,0)
-    time.sleep(DELAY)
-    AsciiArt.ThanksForPlaying()
-    time.sleep(DELAY)
 
 
 

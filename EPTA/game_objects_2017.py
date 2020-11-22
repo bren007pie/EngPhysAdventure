@@ -6,7 +6,7 @@
 #Latest Edit 22/2/2019
 """
 Rules for Writing Objects in the Eng Phys Text Adventure
-0. ALWAYS check the paramaters of the object. If unsure check GameClasses.py for the constructor
+0. ALWAYS check the paramaters of the object. If unsure check game_classes.py for the constructor
 1. Use " (\S)" instead of "\n" for newline characters
 2. If using ANY quotes (" or ') ONLY use ' inside strings.
 The " quote is used to define the string boundry and any in the sentence will break the string.
@@ -20,7 +20,7 @@ All object keys in the game are stored lowercase and used to throw a key error b
 """
 
 
-from GameClasses import *
+from game_classes import *
 import csv
 from Colour import *
 
@@ -33,6 +33,42 @@ DRANGE = 6  # Dimensional range of the map, i.e. number of different buildings/d
 # TODO IF game starts to slow down due to size of MAPS1 empty spaces in this definition:
 #  we'll have to define some funky magic to define different map dictionaries
 #  OR Redefine how the constructor works so don't have to loop through huge empty space to define an new map location
+
+dimension_names = ["OverWorld", "BSB", "Capstone Room", "Green Lake", "Haunted Forest", "Cabin in the Woods"]
+
+def PlayableCharacters(ITEMS):
+    # --- Character Setup ---
+
+    EMPTYHEAD = Equipment('EMPTY', (None, None, None), 'EMPTY.png', 'Nothing is Equipped', 'head', (0, 0, 0), -101)
+    EMPTYBODY = Equipment('EMPTY', (None, None, None), 'EMPTY.png', 'Nothing is Equipped', 'body', (0, 0, 0), -101)
+    EMPTYHAND = Equipment('EMPTY', (None, None, None), 'EMPTY.png', 'Nothing is Equipped', 'hand', (0, 0, 0), -101)
+    EMPTYOFFHAND = Equipment('EMPTY', (None, None, None), 'EMPTY.png', 'Nothing is Equipped', 'off-hand', (0, 0, 0), -101)
+    EMPTYINV = {'head': EMPTYHEAD, 'body': EMPTYBODY, 'hand': EMPTYHAND, 'off-hand': EMPTYOFFHAND}
+
+    # TODO Make PLAYER into PLAYERS a dictionary of playable characters objects
+    STARTLOCATION = (2, 3, 1, 0)
+    STARTHEALTH = 100
+    STARTINV = {'head': EMPTYHEAD, 'body': EMPTYBODY, 'hand': EMPTYHAND, 'off-hand': ITEMS["polaroid photograph"]}
+    # STARTINV = {'head':ITEMS['gas mask'],'body':ITEMS['okons chainmail'],'hand':ITEMS['iron ring'],'off-hand':ITEMS['green bang bong']}
+    PLAYER = Character('Minnick', list(STARTLOCATION), STARTHEALTH, STARTINV, EMPTYINV)
+
+    BRENSTARTLOCATION = (2, 3, 1, 0)  # Dev start location
+    # (4,0,0,4)  haunted forest
+    # (2,3,1,0)  default location
+    # EACH INVENTORY HAS TO BE UNIQUE
+    # BRENINV = EMPTYINV  # THIS CAUSED GHOSTING AND DUPLICATION I THINK BECAUSE OF same referenced object
+    BRENINV = {'head': EMPTYHEAD, 'body': EMPTYBODY, 'hand': EMPTYHAND,'off-hand': EMPTYOFFHAND}  # needs to be unique or else get ghosting/aliasing position
+    # BRENINV = {'head':ITEMS["tyler's visor glasses"],'body':ITEMS["tyler's big hits shirt"],'hand':ITEMS["tyler's hulk hands"],'off-hand':ITEMS["tyler's green bang bong"]} #gets to have the Iron Ring when he graduates
+    DEVPLAYER = Character('Brendan Fallon', list(BRENSTARTLOCATION), 999, BRENINV, EMPTYINV)
+
+
+    # Depricated player but left to show that: OBJECTS need to be UNIQUE so that the location doesn't get messed up when duplicate objects in the game
+    TYINV = {'head': ITEMS["tyler's visor glasses"], 'body': ITEMS["tyler's big hits shirt"],
+             'hand': ITEMS["tyler's hulk hands"],
+             'off-hand': ITEMS["tyler's green bang bong"]}  # gets to have the Iron Ring when he graduates
+    Tyler = Character('Tyler Kashak', list(STARTLOCATION), 420, TYINV, EMPTYINV)
+
+    return PLAYER, DEVPLAYER
 
 def Reset():
     global MAPS1
@@ -151,26 +187,25 @@ def Reset():
     # --- BSB: Dimension 1 ---
     # JHE lobby with a link out to BSB interrior
     # Map("JHE Lobby", (2, 4, 1, 0), "~~:","JHE lobby is alive.\nStudents rushing all around as the smell of burnt coffee and sorrow tickles your nose.\nYou scan the faces around you but see no one familiar.\nThere is a confused air about this place as Kipling was just last night. (\S) Many engineers happy. Many more still grinding.",(), True, 0, [("r", 0, 1, 1, 1)]),
-    Map("BSB South Door", (0, 1, 1, 1), "~BSB First Floor South Door~:\n", "Yeah, you're in a doorway", (), True, 1,[("l", 2, 4, 1, 0)]),
+    Map("BSB Basement Hallway", (0, 0, 0, 1), "~BSB Basement Hallway~:\n", "This endless hallway seems to go on forever. No matter how far you run in each direction you seem to not go anywhere.", ('l','r','f','u','d'), True, 1, [("b", 1, 2, 0, 2)]),
 
     # --- CAPSTONE ROOM: Dimension 2 ---
-    Map("Capstone Doorway", (1, 7, 3, 1), "Capstone Doorway~:\n",
-            "You walk into the room that is a mess. This is a disaster,\nhow did this happen? Do these people live here?",
-            ('u'), True, 1),
-    Map("Circuit Smart", (6, 7, 3, 1), "Circuit Smart~:\n",
-            "(Print text of spagetti)\nIf you unplugged one wire of this these people would go insane.", ('d', 'u'),
-            True, 1),
-    Map("Milli", (6, 6, 3, 1), "Milli~:\n", "Great Job Mili!", ('d', 'u'), True, 1),
-    Map("NANOrims", (6, 5, 3, 1), "NANOrims~:\n", "NANNNOOORYMMSS.", ('d', 'u'), True, 1),
-    Map("S.T.A.R.S.", (5, 5, 3, 1), "S.T.A.R.S.~:\n",
+    Map("THE ECLIPSE", (0, 0, 0, 2), "THE ECLIPSE~:\n","AW DANG The Eclipse! But yeah this windshield is a bit much", ('l','b','d', 'u'), True),
+    Map("ZebraShark", (0, 1, 0, 2), "ZebraShark~:\n", "Where are they? O.m.g. is that a pool downstairs?",('l','d', 'u'), True),
+    Map("T.A. Area", (0, 2, 0, 2), "T.A. Area~:\n","Is this where the PSRs get lost? Also just storage space for STARS", ('f','l','d', 'u'), True),
+
+    Map("S.T.A.R.S.", (1, 0, 0, 2), "S.T.A.R.S.~:\n",
             "S.T.A.R.S. PLEASE WORK.\nYou see a man wearing a pink shirt and a giant robot point a cannon where ever he goes.\nIs this how the world ends?",
-            ('d', 'u'), True, 1),  # S.T.A.R.S. System T69
-    Map("FRAS", (5, 6, 3, 1), "FRAS~:\n", "Yeah that's a tank. This is a 3D printed Tank.", ('d', 'u'), True, 1),
-    Map("T.A. Area", (4, 7, 3, 1), "T.A. Area~:\n","Is this where the PSRs get lost? Also just storage space for STARS", ('d', 'u'), True, 1),
-    Map("ZebraShark", (4, 6, 3, 1), "ZebraShark~:\n", "Where are they? O.m.g. is that a pool downstairs?",('d', 'u'), True, 1),
-    Map("THE ECLIPSE", (4, 5, 3, 1), "THE ECLIPSE~:\n","AW DANG The Eclipse! But yeah this windshield is a bit much", ('d', 'u'), True, 1),
-    Map("Electronics Lab", (3, 7, 3, 1), "Peter's Lab~:\n", "I'm just glad to not have to be in here anymore.",('d', 'u'), True, 1),
-    Map("Peter Jonasson's Office", (3, 6, 3, 1), "Peter Johnason's Office~:\n", "The grand sorcerer's mystic place",('d', 'u'), True, 1),
+            ('b','d', 'u'), True),  # S.T.A.R.S. System T69
+    Map("FRAS", (1, 1, 0, 2), "FRAS~:\n", "Yeah that's a tank. This is a 3D printed Tank.", ('d', 'u'), True),
+    Map("Capstone Doorway", (1, 2, 0, 2), "Capstone Doorway~:\n", "This beeping door is the bane of your existance on late nights", ('d','u'), True, 1, [("f", 0, 0, 0, 1)]),
+
+    Map("NANOrims", (2, 0, 0, 2), "NANOrims~:\n", "NANNNOOORYMMSS.", ('r','d','u'), True),
+    Map("Milli", (2, 1, 0, 2), "Milli~:\n", "Great Job Mili!", ('r','d','u'), True),
+    Map("Circuit Smart", (2, 2, 0, 2), "Circuit Smart~:\n","(Print text of spagetti)\nIf you unplugged one wire of this these people would go insane.", ('f', 'r','u','d'),True),
+
+    #Map("Electronics Lab", (0, 1, 0, 1), "Peter's Lab~:\n", "I'm just glad to not have to be in here anymore.",( 'l','f','u','d'), True),
+    #Map("Peter Jonasson's Office", (0, 1, 0, 1), "Peter Johnason's Office~:\n", "The grand sorcerer's mystic place",('b', 'l','r','u','d'), True),
 
     # --- GREEN LAKE: Dimension 3 ---
     Map("Green Lake",(0,0,0,3),"~~","You wake up in a peaceful place. The water is rushing by down on a nearby like. The leaves are blowing in the wind casting shadows in the green clearing. You feel the warm sun kissing your skin. (\S)Standing just in front of log house you see an old black lab. Sitting patiently waiting for you to throw his ball. He sits beside a sign that reads: Freds' Place.",('f','b','l','r','u','d'),True),
@@ -407,7 +442,7 @@ def Reset():
     Map("Cabin Bathroom", (0, 1, 0, 5), "CABIN BATHROOM: (\S)","Nothing too out of the ordinary in here... (\S)The toilet is a bit old fashio- wait... (\S)Is the toilet paper actually bark? (\S)Clearly we ARE dealing with a madman. (\S)You look around the bathroom... Behind the door... under the sink...",('l', 'f', 'b'), False)
     ]
 
-    #Items: Equipment.name = "Name" - Equipment.location = tuple of location - Equipment.image = .jpg of item
+    #Items: Equipment.name = "Name" - Equipment.location = tuple of location - Equipment.image = .jpg of item_object
     #       Equipment.info = "info" - Equipment.worn = 'head','hand','body',or 'off-hand' - Equipment.stats = (Atk,Def,Spd)
     #Example: Gun = Equipment("Gun",(0,0,0),"Gun.jpg","It shoots people.","hand",(100,0,100),"")
     # TODO Sort items back into "Head", "Body", "Hand", "Off-hand", "Special" (quest items). Via CSVs is the easiest way
@@ -646,16 +681,16 @@ def Reset():
     Equipment("Small Key", None, "Smallkey.jpg","A small metallic key found within a cookie jar in the Cabin in the woods.", "off-hand", (1, 1, 1),-1)
     ]  # DON"T FORGET TO REMOVE THE LAST COMA!
 
-    #Enemies: Enemy.name = "Name" - Enemy.info = "Description" - Enemy.location = (X,Y,Z) - Enemy.stats = (ATK, DEF, SPD) - Enemy.health = [integer]
-    #Enemies: Enemy.drop = Item dropped on death or given - Enemy.need = special item they want - Enemy.Sinfo = "Special comment they have if you bring them 'need' item"
-    #Example: Man = Enemy("Man","A Man",(1,1,1),drop,need,Sinfo,Dinfo)
+    #Enemies: enemy_object.name = "Name" - enemy_object.info = "Description" - enemy_object.location = (X,Y,Z) - enemy_object.stats = (ATK, DEF, SPD) - enemy_object.health = [integer]
+    #Enemies: enemy_object.drop = Item dropped on death or given - enemy_object.need = special item_object they want - enemy_object.Sinfo = "Special comment they have if you bring them 'need' item_object"
+    #Example: Man = enemy_object("Man","A Man",(1,1,1),drop,need,Sinfo,Dinfo)
     #Bosses/Profs
     ENEMIES1 = [
     Enemy("Dr. Minnick",
           "'Hello and welcome to how we retrieve your " +wincolour+ "iron ring" +textcolour+ ".'\n'The " +indicatecolour+ "Quantum Order" +textcolour+ " does not know exactly what you have done.'\n'However, we have felt the consequences of your actions.'\n'I believe the only way to explain this is to show you.'\n'The " +indicatecolour+ "Quantum Order" +textcolour+ " has gathered intelligence that " +personcolour+ "Kenrick" +textcolour+ " has been using\nhis " +itemcolour+ "oscilloscope" +textcolour+ " for evil.'\n'I need you to confront him and return his " +itemcolour+ "oscilloscope" +textcolour+ " if we are to go further. He may not give it up without a fight.'",(None),(400,400,400),200,"Minnick's glasses","Kenrick's oscilloscope","'Ah, you have returned.'\n'You see, " +personcolour+ "Kenrick" +textcolour+ " has retrofitted his " +itemcolour+ "oscilloscope" +textcolour+ " and created some sort\nof 'window' into the electronics world.'\n'Using this window he has been attempting to access the minds of the greatest\nphysicists in history and use their power for evil!'\n'Our intelligence does not go any further and we do not know what he has done.'\n'All that we do know is that after last night you must be rooted in all of this just as the prophecy foretold.'\n'Take these, if you truly are the one, they will reveal what you need to see.'\n'I suggest you start in the " +mapcolour+ "Art Museum" +textcolour+ ".'\n'Also, my lab has since been compromised so I will work in secret in the " +mapcolour+ "basement of Thode" +textcolour+ ".'\n'Once you have found the next " +wincolour+ "quantum relic" +textcolour+ ", my workbench will be ready...'","'I'm jealous of stupid people, they have more opportunities to learn!'",False),
     Enemy("Dr. Novog",
           "What's up folks?",(None),(420,420,420),100,"ancient incantation",'pink donut',"'Alright folks, here's the scoop.''I could only talk to you via the fusion network because the integrity of faculty\ncommunication has been compromised.'\n'The Engineering Physics professors are actually members of an Ancient Council known as The " +indicatecolour+ "Quantum Order" +textcolour+ ".'\n'For years we have kept McMast-'\n'An assassin?'\n'Hmm... I see, things are worse than we thought.'\n'We have known of this uprising within the faculty for some time but\nwere unaware of just how strong they have grown.'\n'As you have heard, a prophecy foretold of an adventurer dictating the future of the faculty.'\n'This evil group wants nothing more than to take advantage of your power and influence for their own plans.'\n'The choices you make will be yours and yours alone, however, the " +indicatecolour+ "Quantum Order" +textcolour+ "\nurges that you consider the consequences of your actions.'\n'It is our duty to assist you in realizing your ability but what comes of your power is out of our hands.'\n'You must contact the oracles who foretold of your coming, they will give you the knowledge you require.'\n'Each member of the " +itemcolour+ "Quantum Order" +textcolour+ " only knows of the location one Oracle.'\n'For that reason I can only help you so much.'\n" +personcolour+ "Dr. Novog" +textcolour+ " pushes a button on a nearby control panel.\nA crane arm descends into the Reactor pool to retrieve a crate from its depths.\n'Take this " +itemcolour+ "incantation" +textcolour+ " and find the " +interactcolour+ "ancient mirror" +textcolour+ " in the " +mapcolour+ "basement of Mills Library" +textcolour+ "... it is your time.'","Folks Folks Folks!",False),
-    Enemy("Dr. Haugen","'Hello, as you are likely aware, there has been a disturbance...'\n'You losing your " +wincolour+ "Iron Ring" +textcolour+ " was no accident, it was taken from you.'\n'The " +indicatecolour+ "Quantum Order" +textcolour+ " is an ancient fold whose goal is to protect the\nUniversity from certain doom and misuse of our knowledge.'\n'There has been an item of importance stolen from us and we need it returned immediately.'\n'Especially if you are to find your " +wincolour+ "Iron Ring" +textcolour+ ".'\n'The council has received intelligence that " +personcolour+ "Dr. Soleymani" +textcolour+ " has stolen " +itemcolour+ "Einstein's brain" +textcolour+ " from the McMaster vault.'\n'You must retrieve it at once, she can be found somewhere in the " +mapcolour+ "hospital" +textcolour+ ".'\n'Do not underestimate her! She has been tempted by a Dark Lord.'\n'The " +indicatecolour+ "Quantum Order" +textcolour+ " requires that you defeat her and return the " +itemcolour+ "brain" +textcolour+ " at once!'",(None),(250,100,999),200,"femtosecond laser","Einstein's Brain","'" +indicatecolour+ "Oh my" +textcolour+ "! You've returned! I knew you could do it!'\n'Quickly, hand it over!'\nYou hand " +personcolour+ "Dr. Haugen" +textcolour+ " the " +itemcolour+ "brain" +textcolour+ " and he opens the " +indicatecolour+ "fridge" +textcolour+ " placing it inside.\n'Now, we just need to mount my " +itemcolour+ "laser" +textcolour+ " onto my bench-'\nSuddenly a rabid " +personcolour+ "Grad Student" +textcolour+ " bursts into the lab!\n'Hand over the " +itemcolour+ "brain" +textcolour+ ", the Dark Lord demands it!' he says.\n'If you strike me down, I will become more powerful than\nyou could possibly imagine' " +personcolour+ "Dr. Haugen" +textcolour+ " replies.\nThe " +personcolour+ "Grad Student" +textcolour+ " lunges at " +personcolour+ "Dr. Haugen" +textcolour+ " who disappears entirely!\nJust before the perplexed " +personcolour+ "Grad Student" +textcolour+ " turns towards you he is met by your blow\nand falls to the floor.","Oh my!",False),
+    Enemy("Dr. Haugen","'Hello, as you are likely aware, there has been a disturbance...'\n'You losing your " +wincolour+ "Iron Ring" +textcolour+ " was no accident, it was taken from you.'\n'The " +indicatecolour+ "Quantum Order" +textcolour+ " is an ancient fold whose goal is to protect the\nUniversity from certain doom and misuse of our knowledge.'\n'There has been an item_object of importance stolen from us and we need it returned immediately.'\n'Especially if you are to find your " +wincolour+ "Iron Ring" +textcolour+ ".'\n'The council has received intelligence that " +personcolour+ "Dr. Soleymani" +textcolour+ " has stolen " +itemcolour+ "Einstein's brain" +textcolour+ " from the McMaster vault.'\n'You must retrieve it at once, she can be found somewhere in the " +mapcolour+ "hospital" +textcolour+ ".'\n'Do not underestimate her! She has been tempted by a Dark Lord.'\n'The " +indicatecolour+ "Quantum Order" +textcolour+ " requires that you defeat her and return the " +itemcolour+ "brain" +textcolour+ " at once!'",(None),(250,100,999),200,"femtosecond laser","Einstein's Brain","'" +indicatecolour+ "Oh my" +textcolour+ "! You've returned! I knew you could do it!'\n'Quickly, hand it over!'\nYou hand " +personcolour+ "Dr. Haugen" +textcolour+ " the " +itemcolour+ "brain" +textcolour+ " and he opens the " +indicatecolour+ "fridge" +textcolour+ " placing it inside.\n'Now, we just need to mount my " +itemcolour+ "laser" +textcolour+ " onto my bench-'\nSuddenly a rabid " +personcolour+ "Grad Student" +textcolour+ " bursts into the lab!\n'Hand over the " +itemcolour+ "brain" +textcolour+ ", the Dark Lord demands it!' he says.\n'If you strike me down, I will become more powerful than\nyou could possibly imagine' " +personcolour+ "Dr. Haugen" +textcolour+ " replies.\nThe " +personcolour+ "Grad Student" +textcolour+ " lunges at " +personcolour+ "Dr. Haugen" +textcolour+ " who disappears entirely!\nJust before the perplexed " +personcolour+ "Grad Student" +textcolour+ " turns towards you he is met by your blow\nand falls to the floor.","Oh my!",False),
     Enemy("Dr. Kitai","I've been trying to develop a new " +itemcolour+ "LED" +textcolour+ "...'\n'But I need some silicon, find me a " +itemcolour+ "Silicon Substrate" +textcolour+ " please!'",(None),(150,50,50),150,"LED of power","silicon substrate","'I've been looking for one just like this, how did you get it?'\n'Maybe you are th-'\n'Nevermind... just be on the lookout for " +personcolour+ "Dr. Kleiman" +textcolour+ ".'","'It was only a midterm, don't off yourself.'",False),
     Enemy("Dr. Knights","'Whoever took the " +itemcolour+ "3W Textbook" +textcolour+ " from the " +mapcolour+ "QT" +textcolour+ " shall feel my eternal wrath...'",(None),(200,100,50),300,"3w textbook","3w textbook","'I've been looking all over for that, have a cold one on me!'\n'But before you go you should know that a difficult road lies ahead.'\n'It will not be easy to have your " +wincolour+ "Iron Ring" +textcolour+ " returned to you'\n'Return the " +itemcolour+ "3W Texbook" +textcolour+ " to the " +mapcolour+ "Quantum Tunnel" +textcolour+ ", then " +personcolour+ "Dr. Haugen" +textcolour+ " should be the one you seek next.'","'What are you doing?!'",False),
     Enemy("Dr. Preston","'I would like to improve my already impressive dad strength.'\n'Bring me a " +itemcolour+ "dumbbell" +textcolour+ ".'",(None),(250,150,100),300,"green lantern shirt","dumbbell","'Yes! Now I can get the pump I've been after!'\n'Go look for " +personcolour+ "Dr. Buijs" +textcolour+ " he has much more to tell than I.'","HOW DID YOU OVERCOME MY DAD STRENGTH?!",False),
@@ -676,7 +711,7 @@ def Reset():
     Enemy("yourself","Wait, but I'm you? Sorry I'm a little busy to think about this right now.",None,(100,100,100),100,"self worth",None,"","Congratulations, you've conquered yourself! It wasn't that hard!",False),
     Enemy("your dad", "Tell your mom the mower's fixed. I'm going to wash the lawn.", None, (250, 250, 250), 200, "crocs of the cartographer", None, "Let's rock & roll!", "At least I don't have to pay the mortgage!",True),
     Enemy("Alex Jones", "YOU THINK YOU'RE A TOUGH GUY. YOU'RE AN INTELLECTUAL DUMBASS", None, (300, 300, 300), 200, " ", None, "WE'RE GUNNA DEFEAT THIS ANTI-HUMAN SCUM. WE'RE GUNNA ROCK THEIR WORLD@", "I HATE YOU. COWARDDD!!!!",True),
-    #Enemy("Special Man","I've been looking for you. Especially after what you did last night.\nI recommend you seek out the profs if you are to find your ring...\nOnly they can right the wrongs you have done.",(5,4,1),(999,999,999),999,"",None,"",""),
+    #enemy_object("Special Man","I've been looking for you. Especially after what you did last night.\nI recommend you seek out the profs if you are to find your ring...\nOnly they can right the wrongs you have done.",(5,4,1),(999,999,999),999,"",None,"",""),
     #General
     Enemy("Liam the Gamer","I am NOT going to finish this assignment... if only I had one to copy.",(3,4,0,0),(10,10,10),15,"Swordfish","horrible assignment","Nice! Take this swordfish. I needed 45 cooking for that.","",False),
     Enemy("Connor the Biologist","I would really like a cricket to continue my research...",(1,7,3,0),(10,10,10),15,"PID control system","cricket","Thanks! I don't know what this does but you can have it!","'I can't believe you've done this.",False),
@@ -700,9 +735,9 @@ def Reset():
     Enemy("Paul the Janitor","'Hey brother, I really could use some Febreze.'",(0,5,1,0),(20,20,20),20,"bleach squirt bottle","Febreze","Rock on brother! Thanks so much!","NOOO, Now I can't go see Black Sabbath!",False),
     Enemy("Undead Grad Student","'Mussst eeaaat funnnndingg... Er, I mean braaains.'",(2,0,0,0),(20,10,1),20,"horrible assignment","einstein's brain","","My 12 year post-grad was for nothiiiiiingggggg!",False),
     Enemy("Daniel Parent", "Hi I'm amazing and Daniel", (3,4,1,0),(30,30,40),50,"STARS Wireless Fix",None,"Thanks!","FINALLY!",True),
-    Animal("Fred the Good Boy", "You talk to Fred. His wise eyes stare at you. It's almost as if he understands what you're saying but he'd rather have have you play with the ball.", (0,0,0,3),(9999,9999,9999),9999,"tennis ball","tennis ball","Fred barks happily. He chews on it for a second and then kicks it back happily to you.","","He smiles at you happily! His tail wags but you can tell he just wants to play with the ball.",True),
+    Animal("Fred the Good Boy", "You talk to Fred. His wise eyes stare at you. It's almost as if he understands what you're saying but he'd rather have have you play with the ball.", (0,0,0,3),(1000000,1000000,1000000),1000000,"tennis ball","tennis ball","Fred barks happily. He chews on it for a second and then kicks it back happily to you.","","He smiles at you happily! His tail wags but you can tell he just wants to play with the ball.",True),
     Enemy("Nicole the Assistant", "Hi! Welcome to the Engineering Physics Office. What can I help you with? Dr. Lapierre should be just across the tunnel in ABB if you're looking for him.", (1, 5, 2, 0),(15,30,15),40,None,None,"","NO! Did I send you too many emails?",True),
-    Animal("Liam the Library Dog","You talk to Liam and it seems to help. Maybe this theropy stuff does work.",(4,0,1,0), (9999, 9999, 9999), 9999, None, None,"", "","Liam cuddles beside you while you scratch/pet him. He's really good at his job.",True),
+    Animal("Liam the Library Dog","You talk to Liam and it seems to help. Maybe this therapy stuff does work.",(4,0,1,0), (1000000, 1000000, 1000000), 1000000, None, None,"", "","Liam cuddles beside you while you scratch/pet him. He's really good at his job.",True),
     Enemy("Devan the most Unhelpful", "You ask Devan if he knows anything about your " +itemcolour+ "iron ring" +textcolour+ ". (\S)He says: 'How'd you hear about this? What did the " +indicatecolour+ "quantum order" +textcolour+ " tell you? We can't speak here, come meet me in " +mapcolour+ "JHE Basement" +textcolour+ ".'", (1,3,1,0), (25, 25, 25), 50, None, None,"", "I WASNT'T GOING TO GIVE YOU A GOOD MARK ANYWAYS!", False),
     Enemy("Hannah the Helpful", "Hey are you okay after what happened at the " +mapcolour+ "Phoenix" +textcolour+ "? Do you need help?", (1,4,2,0), (25, 25, 25), 50, None, None,"", "No! How am I going to make a great capstone now!", True),
     Enemy("Matt the Vuk", "Man you're crazy haha. I wouldn't be walking after what you did at the " +mapcolour+ "Phoenix" +textcolour+ ".",(4,4,1,0), (25, 25, 25), 50, None, None, "", "Now how am I supposed to be the ultimate Eng Phys guy?", True),
@@ -727,9 +762,9 @@ def Reset():
     ]
 
     #Stationary Objects to interact with
-    #Interact(name,location,info,Sinfo,need,drop)
+    #interact_object(name,location,info,Sinfo,need,drop)
     INTERACT1 = [
-    #Interact("Attack Fan",(1,1,1),"It's a garbage can.","You throw the MSP430 in... Yes, you have chosen wisely.","msp430","Vomit"),
+    #interact_object("Attack Fan",(1,1,1),"It's a garbage can.","You throw the MSP430 in... Yes, you have chosen wisely.","msp430","Vomit"),
     Interact("Garbage Can",(2,3,1,0),"It's a garbage can.","You throw the MSP430 in... Yes, you have chosen wisely.","msp430","Vomit",False),
     Interact("Broken Reactor",(4,5,0,0),"It's an old broken reactor.","After some elbow grease and a bit of luck you manage to complete the reactor.\nThere is a low whirr as the device starts and begins to glow with a\npink hue.\nSuddenly, you hear the door crash open behind you!\nDr. Kleimann enters in a hurry.\n'Finally, the power I need!' he says as he rushed past you and reaches for the glowing plasma.\nThe plasma appears to bend to his will and is absorbed by his outstretched hand!\n'I AM COMPLEEEEEEEEETE!' he bellows in a demonic tone.\n'You fool, did you not recognize the deliberate mispelling of this mortal's name?'\n'Two n's? That is a characteristic of a name fit for a physics GOD!'\n'It is I, "+personcolour+"STEFAN BOLTZMANN"+textcolour+"! And you have given me the power I need to free myself\nfrom this mortal form!'\nAfter glowing, levitating, and transforming... "+personcolour+"Stefan Boltzmann"+textcolour+" lunges at you!","flux capacitor",None,False),
     Interact("Fridge",(1,6,0,0),"Seems like a regular fridge to me.","You inspect the inside of the fridge to reveal a small keyhole.\nUpon inserting and turning the key you hear a robotic voice bellow.\n'WORMHOLE ACTIVATED'\nThe compartment bursts open and out flies a book!",'relativistic key','Pedrotti cubed',False),
@@ -745,7 +780,7 @@ def Reset():
     Interact("Red Book",(4,0,1,0),"It's a guide to living outdoors. (\S)Flipping through the pages you read: (\S)'Hedysarum alpinum also known as the greenberry is characterized by it's lateral veins.' (\S)'If ingested, casues immediate starvation and death.'","","","",False),
     Interact("Blue Book",(4,0,1,0),"It's a biology textbook. (\S)Flipping through you read: (\S)'The mitochondria is the powerhouse of the cell.'","","","",True),
     Interact("Old Journal",(6,1,0,0),"You blow the dust off, open it, and read:\n'The ability to peer into history would be a most formidable power.'\n'I have potentially produced a piece of the puzzle but without a\n'device capable of maintaining the field density long enough I fear\n'it will never become a reality.'\n'Thus I have decided to hide my invention until the time comes where\nsomeone can realize my dream.'\n'If you are reading this, find the place where you can see\ncampus in its entirety.'(\S)'If you ARE the hero, the next steps shall be revealed.'(\S)-M. Faraday","","","",False),
-    #Interact("Box of old CDs",(2,4,0),"It's a dusty box of old CDs...","You insert one of the CDs into the monolithic computing device...\nThe laptop instantly blue-screens and bursts into flames.","lenovo laptop",None),
+    #interact_object("Box of old CDs",(2,4,0),"It's a dusty box of old CDs...","You insert one of the CDs into the monolithic computing device...\nThe laptop instantly blue-screens and bursts into flames.","lenovo laptop",None),
     Interact("Display Case",(1,6,1,0),"It's a display case full of all sorts of old-time Engineering Physics wizardry.","The rusty key fits perfectly!\nAs you turn the key glowing square forms on the back\nof the display case and opens revealing an old relic...","rusty key","Faraday's Cage",False),
     Interact("SharpXChange",(0,1,1,0),"Would you like to exchange a needle?","Needle Accepted!","dirty needle","clean needle",False),
     Interact("Sun Dial",(3,2,1,0),"You can't even tell time on an analog clock.\nHow are you supposed to use this?","Through Dr. Minnick's glasses, you see a green glowing handprint appears\non the face of the sundial!\nYou place your hand on it and a compartment opens.","Minnick's glasses","rusty key",False),
@@ -764,7 +799,7 @@ def Reset():
     Interact("Ancient Mirror",(4,0,0,0),"It's an old mirror from a time long past.","You mutter the incantation... Suddenly, you see the reflection of Richard Feynman himself standing behind you!\n'You have come a long way. The way of the physicist is strong with you.'\n'Here, take this it is one of the 3 Quantum Relics.\n'You will need all 3 to acquire your Iron Ring.'\n'Trust your instincts and when the time comes you will know what to do.","ancient incantation","gamma glove",False),
     Interact("Pack-a-Punch", (None), "Punch your fists into the air and raise a rebel yell! (\S)"
              "There's a lots of bad'uns out there you need to send to hell!" ,
-             "Pack-a-Punch Machine:(\S) To use this machine enter your item and another to sacrafice. Depending on the relative stats of the sacrifice, the stats of the upgrade will double or have the sacrifice added to them.",None, None,False),
+             "Pack-a-Punch Machine:(\S) To use this machine enter your item_object and another to sacrafice. Depending on the relative stats of the sacrifice, the stats of the upgrade will double or have the sacrifice added to them.",None, None,False),
     Interact("Lake Painting", (3, 0, 1, 0), "A painting of a beautiful lake. It brings you peace.", "You feel a pull. All of a sudden you're being pulled into the painting and all around you it's getting bright. (\S)You wake up to the sound of birds chirping and a soft breeze.", "old car keys", None,True),
     Interact("Portkey", (0, 0, 0, 3), "This portkey looks like the way back. Whatever magic brought you here must be related to this lake.", "Your world compresses as you're pulled violently into something. (\S)You're back in the Art Museum. Were you ever gone?", None, None,True),
     Interact("Rick's Crafting Bench", (0, 0, 0, 3), "This bench can create anything made of wood or diamond.","You spend hours crafting the device to the precision you need. It's perfect.","softwood 2x4 stud", "sharpxchange",True),
@@ -887,13 +922,13 @@ def WorldMap():
             y = position[1]
             z = position[2]
             dim = position[3]
-            MAPS1[x][y][z][dim].placeEnemy(i)
+            MAPS1[x][y][z][dim].place_enemy(i)
         else:
             i.location = (None,None,None,None)
         if i.need:
-            i.need = i.need.lower() #this fixed a key error where it would crash because it looked for the uppercase version of an item
+            i.need = i.need.lower() #this fixed a key error where it would crash because it looked for the uppercase version of an item_object
         if i.drop:
-            i.drop = i.drop.lower() #this fixed a key error where it would crash because it looked for the uppercase version of an item
+            i.drop = i.drop.lower() #this fixed a key error where it would crash because it looked for the uppercase version of an item_object
     for i in ITEMS1:
         if i.location:
             position = i.location
@@ -901,7 +936,7 @@ def WorldMap():
             y = position[1]
             z = position[2]
             dim = position[3]
-            MAPS1[x][y][z][dim].placeItem(i)
+            MAPS1[x][y][z][dim].place_item(i)
         else:
             i.location = (None,None,None,None)
     for i in INTERACT1:
@@ -911,13 +946,13 @@ def WorldMap():
             y = position[1]
             z = position[2]
             dim = position[3]
-            MAPS1[x][y][z][dim].placeItem(i)
+            MAPS1[x][y][z][dim].place_item(i)
         else:
             i.location = (None,None,None,None)
         if i.need:
-            i.need = i.need.lower() #this fixed a key error where it would crash because it looked for the uppercase version of an item
+            i.need = i.need.lower() #this fixed a key error where it would crash because it looked for the uppercase version of an item_object
         if i.drop:
-            i.drop = i.drop.lower() #this fixed a key error where it would crash because it looked for the uppercase version of an item
+            i.drop = i.drop.lower() #this fixed a key error where it would crash because it looked for the uppercase version of an item_object
     return tuple(MAPS1)
 
 def ItemDictionary():

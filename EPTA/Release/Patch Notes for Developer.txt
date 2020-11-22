@@ -85,7 +85,7 @@ ADDED MAP 2nd floor hatch
 ADDED diaolog for Dan Fitz
 CHANGE Removed walls the 2nd floors so you can walk between them where you can on campus
 Tryed to start making a load from log file but made infinite loops (make load from log once you have a debug file to do)
-CHANGE Changed name of map class Remove to removeItem to be more clear and fit camelcase
+CHANGE Changed name of map class Remove to remove_item to be more clear and fit camelcase
 ADDED Comments to a lot of code and Brendan learned how it works, still not sure why it does though
 ADDED Creative mode file with developer functions to help, 
 ADDED save files and load functions made for the devloper and now the player!
