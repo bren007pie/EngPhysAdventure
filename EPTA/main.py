@@ -10,11 +10,33 @@ Setup.py = Py2exe file used to compile into an exe. Run using "python setup.py p
 
 In general try to keep this structure and put any other long ascii or modules into another file.
 """
+
+# --- Import Screen where you choose which version of the game to import ---
+import importlib
+from Colour import *
+
+print(CLEARSCREEN)
+version_screen = 1
+while(version_screen):
+    try:
+        game_choice = input("What version would you like to play? \n\n[1] ( 2017 - 2018 ) The Eng Phys Text Adventure \n[2] ( 2018 - 2019 ) The Capstone Adventure \n\n")
+        #game_choice = input("What version would you like to play? \n\n[1] ( 2017 - 2018 ) The Eng Phys Text Adventure \n[2] ( 2018 - 2019 ) The Capstone Adventure \n[3] ? \n[4] ( 2020 - 2021 ) The COVID Text Adventure \n\n")
+        game_choice = int(game_choice)
+        game_object_modules = ["game_objects_2017","game_objects_2018"]
+        game_script_modules = ["game_scripts_2017","game_scripts_2018"]
+        game_objects = importlib.import_module(game_object_modules[game_choice - 1])
+        game_scripts = importlib.import_module(game_script_modules[game_choice - 1])
+        version_screen = 0
+    except:
+        print(CLEARSCREEN)
+        print("" + losecolour + "Please enter a valid number." + textcolour + "")
+
+
+print("BLARG")
 from GameFunctions import * #this imports the code and all the code dependancies (functions imported in that)
 import start_screen    #don't import * from these b.c. these pull global variables from game functions and doing a recursive import creates errors
-import game_scripts_2017 as game_scripts  # Used to separate quest/event functions
+#import game_scripts_2017 as game_scripts  # Used to separate quest/event functions
 import TextParser  # Used to separate text interpretation and commands
-from Colour import *
 import AsciiArt
 
 #from TextParser import *  got rid of this to reduce import tracing tracking problems but may break everything
@@ -293,6 +315,7 @@ except:  # does nothing if no dev file there
 
 
 
+if not GAMEINFO['devmode']: start_screen.splash_screen()  # runs the splash screen if not in devmode
 
 # Start Screen is after reading in settings so it can skip start screen if enabled
 MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = start_screen.StartScreen()  # Startscreen loop where you can play new game, loadgame, choose settings, or exit

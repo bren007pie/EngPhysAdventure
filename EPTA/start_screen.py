@@ -16,13 +16,43 @@ from GameFunctions import GAMESETTINGS, GAMEINFO # imports these global variable
 # TODO Implement these based on the size of the screen
 #LINEBREAK = "========================================================================" #standard display with 72 characters
 LINEBREAK = "=======================The=Eng=Phys=Text=Adventure=======================" #standard display with 72 characters
-#CLEARSCREEN = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" #35 newlines
+
+
+def splash_screen():
+    print(CLEARSCREEN)
+    print(textcolour)  # This sets all text color just incase it's weird
+
+    # -- 13 Hollywood Productions --
+    audiopath = os.path.join(os.getcwd(), "MediaAssets", "", "EFXstartup.mp3")  # points to the eddited star wars theme
+    playsound.playsound(audiopath, False)  # plays the startup sound with 'multi-threading'
+    print("                " + red + "A" + textcolour + "____ ________")
+    print("                /_  H|\_____  \ ")
+    print("                 |  O|  ___|  |")
+    print("                 |  L| /___   <")
+    print("                 |  L|  ___\   |")
+    print("                 |  Y| /W O O D|")
+    print("                 |___|/________/")
+    print("                      " + red + "Production." + textcolour + "")
+    time.sleep(3)  # Delay for intro sound
+    print(CLEARSCREEN)
+
+    # -- Nevada Animation --
+    nevada_animation(os.path.join(os.getcwd(), "MediaAssets", "", "ILLUMINATILiMEDcut.mp3"))
+
+
+#def version_screen():
+
+
+
+
 #Graphics , audio, difficulty, modes, advanced
 #screen width, default read speed/On/Off, suggestion for green
 #music on/off, sound levels eventually?
 #Eventually easy-medium-hardcore
 #eventually speed run, hardcore mode, dev mode, iron man eventually
 #all of the settings individually not grouped into modes
+
+
 def StartScreen():
     # These are all the global dictionaries/objects in the game. Anywhere where a loadgame happens you need all the global variables
     global PLAYER  # The main character. player is an object instance of class character.
@@ -37,34 +67,6 @@ def StartScreen():
     # If not assignment within the function  may lead to changes only in the local scope
 
     print(textcolour)  # This sets all text color
-    #print backgroundcolour  # This sets the background colour
-    #print weirdback
-
-
-    if GAMEINFO['devmode']:
-        pass  # If in dev mode do nothing and skip intro
-# The pass statement in Python is used when a statement is required syntactically but you do not want code to execute.
-    else:
-        # If no Dev Mode do the blip intro
-        print(CLEARSCREEN)
-        audiopath = os.path.join(os.getcwd(), "MediaAssets","","EFXstartup.mp3") #points to the eddited star wars theme
-        playsound.playsound(audiopath, False) # plays the startup sound with 'multi-threading'
-        print("                " + red + "A" + textcolour + "____ ________")
-        print("                /_  H|\_____  \ ")
-        print("                 |  O|  ___|  |")
-        print("                 |  L| /___   <")
-        print("                 |  L|  ___\   |")
-        print("                 |  Y| /W O O D|")
-        print("                 |___|/________/")
-        print("                      " + red + "Production." + textcolour + "")
-        time.sleep(3)  # Delay for intro sound
-        print(CLEARSCREEN)
-
-        # -- Nevada Animation --
-        nevada_animation(os.path.join(os.getcwd(), "MediaAssets", "", "ILLUMINATILiMEDcut.mp3"))
-
-
-
 
     startmenu = True  # startmenu is the variable that keeps you in the startmenu screen loop
 

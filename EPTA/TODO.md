@@ -21,8 +21,13 @@
 # 0.31 Anniversary update
 - [x] Attempt to see if you can get different modules to import conditionally - Nov. 19, 2020
 - [x] Seperate all hard-coded objects to completly seperate the game engine and game
+- [ ] Get rid of total imports (* brining everything into namespace) 
+        so can clearly see and define how to do import dependencies
+
 - [ ] Create selector to select year and import properly
-- [ ] Playtest origional version of the game
+- [ ] Make so you can pause, exit to the start screen
+- [ ] Make a build and playtest origional version of the game
+- [ ] See if there's a way to refresh the game? If not no worries
 
 - [ ] Attempt to run EPTA in future versions of the game
 
