@@ -32,7 +32,7 @@ def two_tuple_add(a, b):  # adds 2 tuples element-wise
 class Equipment:
     def __init__(self,name,location,image,info,worn,stats,health):
         self.name = str(name)
-        self.colouredname = "" +itemcolour+ name +textcolour+ ""
+        self.colouredname = "" + itemcolour + name + textcolour + ""
         self.image = str(image)  # This is an obsolete field from when the game was going to have pictures
         self.info = str(info)  # This is the base description that is read
         self.worn = str(worn)  # Which inventory slot the item_object takes up
@@ -64,29 +64,63 @@ class Character:
     def update_stats(self): #updates stats based on changing equipment
         self.stats = six_tuple_add(self.inv['head'].stats, self.inv['body'].stats, self.inv['hand'].stats, self.inv['off-hand'].stats, tuple(self.basestats), (0, 0, 0))
 
-    def equip(self, equip_item_object):
-        drop = 0
-        # You're already wearing the thing
-        if self.inv[equip_item_object.worn] == equip_item_object:
-            printT(" (\S)You realize this you already have a " + equip_item_object.colouredname + " on you. It's okay, we all have tough days. (\S)", 72, 0.25)
+    def equip(self, item_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):
+        x = self.location[0]
+        y = self.location[1]
+        z = self.location[2]
+        dim = self.location[3]
+        place = MAPS[x][y][z][dim]
+        if item_string in ITEMS and list(ITEMS[item_string].location) == self.location:  # if name of item_string asked for in parser is in ITEMS dictionary
 
-        # if your inventory is empty
-        elif (self.location == list(equip_item_object.location) and self.inv[equip_item_object.worn] == self.emptyinv[equip_item_object.worn]):
-            self.inv[equip_item_object.worn] = equip_item_object
-            equip_item_object.location = self.location
-            printT(" (\S)" + equip_item_object.info + " (\S)", 72, 0.25)
-            printT("You've equipped the " + equip_item_object.colouredname + ' to your ' + equip_item_object.worn + ".", 72, 0.25)
-        # If you have something on you that you're replacing
-        elif(self.location == list(equip_item_object.location)):
-            drop = self.inv[equip_item_object.worn]
-            self.inv[equip_item_object.worn] = equip_item_object
-            equip_item_object.location = self.location
-            printT(" (\S)" + equip_item_object.info + " (\S)")
-            printT("You've equipped the " + equip_item_object.colouredname + ' to your ' + equip_item_object.worn + ', the ' + drop.colouredname + ' has been dropped.')
+            # this is different than the equip method in the Character class for some reason
+            # Makes sure the item_object is dropped at the current location
+            # TODO Redo this drop and equip structure. Is dumb and can cause duplicates/ghosting
+
+            equip_item_object = ITEMS[item_string]
+            drop = 0
+            # You're already wearing the thing
+            if self.inv[equip_item_object.worn] == equip_item_object:
+                printT(" (\S)You realize this you already have a " + equip_item_object.colouredname + " on you. It's okay, we all have tough days. (\S)",72, 0.25)
+
+            # if your inventory is empty
+            elif (self.location == list(equip_item_object.location) and self.inv[equip_item_object.worn] ==
+                  self.emptyinv[equip_item_object.worn]):
+                self.inv[equip_item_object.worn] = equip_item_object
+                equip_item_object.location = self.location
+                printT(" (\S)" + equip_item_object.info + " (\S)", 72, 0.25)
+                printT(
+                    "You've equipped the " + equip_item_object.colouredname + ' to your ' + equip_item_object.worn + ".",
+                    72, 0.25)
+            # If you have something on you that you're replacing
+            elif (self.location == list(equip_item_object.location)):
+                drop = self.inv[equip_item_object.worn]
+                self.inv[equip_item_object.worn] = equip_item_object
+                equip_item_object.location = self.location
+                printT(" (\S)" + equip_item_object.info + " (\S)")
+                printT("You've equipped the " + equip_item_object.colouredname + ' to your ' + equip_item_object.worn + ', the ' + drop.colouredname + ' has been dropped.')
+            else:
+                printT(
+                    " (\S)You can't find a " + equip_item_object.colouredname + " around here. Maybe it's your hungover brain.")
+            self.update_stats()
+
+            place.remove_item(ITEMS[item_string])  # removes that item_object from the invoirnment
+            place.place_item(drop)  # places the drop if there's something to drop
+            ITEMS[item_string].quest = True  # quest/inspect flag is true
+
+        # other acceptations for weird requests
+        elif item_string in INTERACT and list(INTERACT[item_string].location) == self.location:  # Interacts
+            printT("Maybe if you were at your peak you could carry a " + str(INTERACT[item_string].colouredname) + " but not with this migraine.")
+        elif item_string in ENEMIES and list(ENEMIES[item_string].location) == self.location and ENEMIES[item_string].alive:  # People
+            printT("You attempt to pick up " + ENEMIES[item_string].colouredname + " but you're not that close... (\S)And now you're both really uncomfortable.")
+        elif item_string in ENEMIES and list(ENEMIES[item_string].location) == self.location and not ENEMIES[item_string].alive:  # Dead People
+            printT("That's pretty messed up. You probably shouldn't pick up " + deadpersoncolour + ENEMIES[item_string].name + textcolour + "'s dead body.")
         else:
-            printT(" (\S)You can't find a " + equip_item_object.colouredname + " around here. Maybe it's your hungover brain.")
-        self.update_stats()
-        return drop
+            printT(" (\S)You can't find a " + itemcolour + item_string + textcolour + " around here. Maybe it's your hungover brain.")
+
+        # return drop
+        return MAPS, self, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS  # returning the game state
+
+
 
     def drop(self, drop_item_object):  # Equip is an object not a name
         drop = 0

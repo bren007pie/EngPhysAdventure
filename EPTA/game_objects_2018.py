@@ -6,7 +6,7 @@
 #Latest Edit 22/2/2019
 """
 Rules for Writing Objects in the Eng Phys Text Adventure
-0. ALWAYS check the paramaters of the object. If unsure check game_classes.py for the constructor
+0. ALWAYS check the paramaters of the object. If unsure check game_classes_2017.py for the constructor
 1. Use " (\S)" instead of "\n" for newline characters
 2. If using ANY quotes (" or ') ONLY use ' inside strings.
 The " quote is used to define the string boundry and any in the sentence will break the string.
@@ -20,7 +20,7 @@ All object keys in the game are stored lowercase and used to throw a key error b
 """
 
 
-from game_classes import *
+from game_classes_2017 import *
 import csv
 from Colour import *
 

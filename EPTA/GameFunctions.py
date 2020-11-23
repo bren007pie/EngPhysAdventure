@@ -1,7 +1,7 @@
 #This is the file used for most backend, interaction, startup/global variables,  functions of the game
 
 
-from game_classes import *
+from game_classes_2017 import *
 import game_objects_2017 as game_objects  # Important as a name for game version polymorphism
 import AsciiArt
 import time
@@ -115,63 +115,38 @@ elif platform == "darwin":  # OS X/MAC
 
 
 
-# TODO Make these functions into class methods related to each class
-def Equip(Item):  # Item is a string not an object
-    global PLAYER
-    global ITEMS
-    global MAPS
-    global INTERACT
+# TODO Make these game functions into class methods related to each class
+
+def Drop(item_string):  # item_string is a string not an object
+    global PLAYER #The main character. player is an object instance of class character.
+    global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global MAPS #All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
+    global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class interact_object keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global QUESTS #Quest statuses. This is a dictionary of flags (1 or 0) for the status of the quest keyed by quest name.
+    global ENEMIES #All the npcs. This a dictionary of objects of class enemy_object keyed by their lowcase equipment name (item_object.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
+    global GAMEINFO #Miscellaneous game info. Dictionary of all sorts of variables
+    global GAMESETTINGS # The game settings that are saved in the game
+
     x = PLAYER.location[0]
     y = PLAYER.location[1]
     z = PLAYER.location[2]
     dim = PLAYER.location[3]
     Place = MAPS[x][y][z][dim]
-    if Item in ITEMS and list(ITEMS[Item].location) == PLAYER.location:  # if name of Item asked for in parser is in ITEMS dictionary
-
-        # this is different than the equip method in the Character class for some reason
-        # Makes sure the item_object is dropped at the current location
+    if item_string in ITEMS and list(ITEMS[item_string].location) == PLAYER.location:
         # TODO Redo this drop and equip structure. Is dumb and can cause duplicates/ghosting
-        drop = PLAYER.equip(ITEMS[Item])  # does the equip method on the player
-        Place.remove_item(ITEMS[Item])   # removes that item_object from the invoirnment
-        Place.place_item(drop)  # places the drop if there's something to drop
-        ITEMS[Item].quest = True  # quest/inspect flag is true
-
-    # other acceptations for weird requests
-    elif Item in INTERACT and list(INTERACT[Item].location) == PLAYER.location:  # Interacts
-        printT("Maybe if you were at your peak you could carry a " + str(INTERACT[Item].colouredname) + " but not with this migraine.")
-    elif Item in ENEMIES and list(ENEMIES[Item].location) == PLAYER.location and ENEMIES[Item].alive: # People
-        printT("You attempt to pick up " + ENEMIES[Item].colouredname + " but you're not that close... (\S)And now you're both really uncomfortable.")
-    elif Item in ENEMIES and list(ENEMIES[Item].location) == PLAYER.location and not ENEMIES[Item].alive:  # Dead People
-        printT("That's pretty messed up. You probably shouldn't pick up " +deadpersoncolour+ ENEMIES[Item].name + textcolour+ "'s body.")
-    else:
-        printT(" (\S)You can't find a " +itemcolour+ Item +textcolour+ " around here. Maybe it's your hungover brain.")
-
-
-def Drop(Item):  # Item is a string not an object
-    global MAPS
-    global PLAYER
-    global ITEMS
-    global ENEMIES
-    x = PLAYER.location[0]
-    y = PLAYER.location[1]
-    z = PLAYER.location[2]
-    dim = PLAYER.location[3]
-    Place = MAPS[x][y][z][dim]
-    if Item in ITEMS and list(ITEMS[Item].location) == PLAYER.location:
-        # TODO Redo this drop and equip structure. Is dumb and can cause duplicates/ghosting
-        drop = PLAYER.drop(ITEMS[Item])  # the player drop method that will return the item_object dropped
+        drop = PLAYER.drop(ITEMS[item_string])  # the player drop method that will return the item_object dropped
         Place.place_item(drop)  # places the drop on the ground
         # Same as equip function. 'None' passed to function if item_object doesn't exist
 
     # other acceptations for weird requests
-    elif Item in INTERACT and list(INTERACT[Item].location) == PLAYER.location: # Interacts
-        printT("You probably shouldn't drop the " + str(INTERACT[Item].colouredname) + ". It might break.")
-    elif Item in ENEMIES and list(ENEMIES[Item].location) == PLAYER.location and ENEMIES[Item].alive: # People
-        printT("You drop " + ENEMIES[Item].colouredname + " but they were never yours, to begin with. (\S)Now you just have one less friend...")
-    elif Item in ENEMIES and list(ENEMIES[Item].location) == PLAYER.location and not ENEMIES[Item].alive: # Dead People
-        printT("You pick up " +deadpersoncolour+ ENEMIES[Item].name +textcolour+ "'s body and drop it. Do you get a kick out of this?")
+    elif item_string in INTERACT and list(INTERACT[item_string].location) == PLAYER.location: # Interacts
+        printT("You probably shouldn't drop the " + str(INTERACT[item_string].colouredname) + ". It might break.")
+    elif item_string in ENEMIES and list(ENEMIES[item_string].location) == PLAYER.location and ENEMIES[item_string].alive: # People
+        printT("You drop " + ENEMIES[item_string].colouredname + " but they were never yours, to begin with. (\S)Now you just have one less friend...")
+    elif item_string in ENEMIES and list(ENEMIES[item_string].location) == PLAYER.location and not ENEMIES[item_string].alive: # Dead People
+        printT("You pick up " +deadpersoncolour+ ENEMIES[item_string].name +textcolour+ "'s body and drop it. Do you get a kick out of this?")
     else:
-       printT("Maybe you're still drunk?. You aren't carrying a " +itemcolour+ Item +textcolour+ ".")
+       printT("Maybe you're still drunk?. You aren't carrying a " +itemcolour+ item_string +textcolour+ ".")
 
 
 
@@ -331,7 +306,7 @@ def Attack(E):  # E is a string not an object
     if E in ENEMIES and (list(ENEMIES[E].location) == PLAYER.location) and (ENEMIES[E].alive):
         enemy = ENEMIES[E]  # making it the object from the name
 
-        # -- Main Attack Function --
+        # -- Attack Function --
         from game_scripts_2017 import attack_script  # Can't just import gamescripts globally in gamefunctions.
         MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = attack_script(enemy, MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # scripting interface
 

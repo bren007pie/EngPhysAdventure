@@ -304,10 +304,10 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
 
 
         # --- Object Spellchecking and Shortcuts ---
-        if verb == "/": objectName = wordlist[1]  # Doesn't do spell check if creative command
+        if verb == "/": object_string = wordlist[1]  # Doesn't do spell check if creative command
 
         #       --- ShortKey Object Shortcut  ---
-        # ShortKey matching to give it the right objectName
+        # ShortKey matching to give it the right object_string
         elif str.isdigit(wordlist[1]):  # if the object is a number assume it's a shortkey
             x, y, z, dim = PLAYER.location
             shortkey = int(wordlist[1])  # converts from string to int because we know it's an int
@@ -319,19 +319,19 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
                 return MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS  # returns out of the function because invalid input
             for i in range(1,len(surroundingobjects)+1):  # Shifted loop because starting at 1
                 if i == shortkey:
-                    objectName = surroundingobjects[i-1].name.lower()  # assigns the object name to the same position as seen
-                    if objectName == "empty":  # if you request something with an empty object it exists
+                    object_string = surroundingobjects[i-1].name.lower()  # assigns the object name to the same position as seen
+                    if object_string == "empty":  # if you request something with an empty object it exists
                         playerslot = ["head","body","hand","off-hand"]
                         printT("Your hungover brain realizes you aren't wearing anything on your " + str(playerslot[i-1]) +".")
                         return MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS
         # TODO make exclusion list for custom parser things like these that you don't want spellchecking on 2nd word
-        elif verb in ['go', 'move', 'walk', 'run', 'turn','say','sing','/script']: objectName = wordlist[1]  # no spell check for certain thing
+        elif verb in ['go', 'move', 'walk', 'run', 'turn','say','sing','/script']: object_string = wordlist[1]  # no spell check for certain thing
 
         #       --- Object SubWord Search ---
         # This function allows you to put in one+ word object names and still find a match
         else:
-            #       --- Exceptions ---
-            if verb in ['pick']:  # used for pick up exception for equiping
+            #       -- Exception stripping --
+            if verb in ['pick']:  # used for pick up exception for equiping using word "pick up" strips off the pick
                 if wordlist[1].lstrip().startswith("up"):  # if up is the second word
                     wordlist[1] = wordlist[1].lstrip().split("up")[1].lstrip()  # strips down to just the object name
             elif verb in ['look']:  # used for look at exception for inspecting
@@ -349,13 +349,13 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
             for object in surroundingobjects:
                 name = object.name.lower()
                 if (name == wordlist[1]) or (wordlist[1] in DIRECTIONWORDS):  # If the word is typed perfectly save it and stop the loop
-                    objectName = wordlist[1]
+                    object_string = wordlist[1]
                 else:  # creates list of full names and broken apart ones
                     surobjectsfullnames.append(name)
                     surobjectswords += name.split(" ")
 
             try:
-                objectName  # if there was a direct match can skip all this subsearch nonsense
+                object_string  # if there was a direct match can skip all this subsearch nonsense
             except:
                 #       --- Filtering Duplicates ---
 
@@ -405,13 +405,13 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
                         for object in surobjectsfullnames:
                             if object.find(word) is not -1:  # does a substring search in each word
                                 if GAMEINFO['devmode']: print("Parser found a substring!")  # Debug
-                                objectName = object
+                                object_string = object
                         try:
-                            objectName  # See if object is defined
+                            object_string  # See if object is defined
                         except:  # try one last time with old spellcheck to at least not crash
-                            objectName = SpellCheck(wordlist[1], ALLKEYS)  # Does do spell check if normal
+                            object_string = SpellCheck(wordlist[1], ALLKEYS)  # Does do spell check if normal
                             # Spellchecking for debugging
-                            #printT("Your brain is pretty sure you meant " + objectName + " instead of " + wordlist[1] +".")
+                            #printT("Your brain is pretty sure you meant " + object_string + " instead of " + wordlist[1] +".")
 
                     else:  # last option is to say we can't find it
                         printT(" (\S)You can't find that around here. Maybe it's your hungover typing.")
@@ -427,41 +427,42 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
                     print(surobjectswords)
                     print(duplicatewords)
                     print(objectlist)
-                    print(objectName)
+                    print(object_string)
 
 
         #  --- Parsing ---
         if verb in ['e','equip', 'get', 'wear']:
-            Equip(objectName)
+            MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = PLAYER.equip(object_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # equip method of the player
 
         elif verb in ['dr','drop', 'throw']:
-            Drop(objectName)
+            Drop(object_string)
 
         elif verb in ['a','attack', 'kill', 'fight']:
-            Attack(objectName)
+            Attack(object_string)
 
         elif verb in ['t','talk', 'speak']:
-            Talk(objectName)
+            Talk(object_string)
 
-        elif verb == "look" and objectName == "around":  # used just for look around case. Has to be above inspect conditional so it triggers first
+        elif verb == "look" and object_string == "around":  # used just for look around case. Has to be above inspect conditional so it triggers first
             x, y, z, dim = PLAYER.location
             MAPS[x][y][z][dim].search(MAPS, dimension_names, GAMESETTINGS)
 
         elif verb in ['ex','inspect', 'examine','read', 'open', 'look']:
-            Inspect(objectName)
+            Inspect(object_string)
 
         elif verb in ['ea','eat', 'drink', 'inhale', 'ingest', 'devour']:
-            Eat(objectName)
+            Eat(object_string)
 
         elif verb in ['go', 'move', 'walk', 'run', 'turn']:  # this may or may not work
-            CurrentPlace = Move(objectName,DIRECTIONWORDS,DIRECTIONSHORTCUTS)
+            CurrentPlace = Move(object_string,DIRECTIONWORDS,DIRECTIONSHORTCUTS)
             GAMEINFO['stepcount'] += 1  # increments the stepcount after taking a step (whether sucessful or not)
 
         elif verb == "/":  # if using a CreativeMode command
-            CreativeMode.creative_parser(objectName)
+            CreativeMode.creative_parser(object_string)
 
         elif verb == "pick":  # Allows for pick up to be a thing, is formatted in exceptions above
-            Equip(objectName)  # Equipts it
+            MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = PLAYER.equip(object_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # equip method of the player
+
         elif verb in ['us','use']:  # this makes it so you can use items if the interacble is in the area
             x, y, z, dim = PLAYER.location
             # checks all interactables in area to see if item_object is needed
@@ -469,17 +470,17 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
                                  + MAPS[x][y][z][dim].items + MAPS[x][y][z][dim].ENEMY
             match = False
             for i in surroundingobjects:  # checks to make sure in surroundings
-                if i.name.lower() == objectName.lower():
+                if i.name.lower() == object_string.lower():
                     match = True
             if match:
                 for interactable in MAPS[x][y][z][dim].items:  # for all itmes+interactables in the area
                     if isinstance(interactable, Interact):  # if it's in interactable
-                        if interactable.need == objectName:
-                            printT(" (\S)You use the " +itemcolour+ objectName +textcolour+ " with the " +interactcolour+ interactable.name +textcolour+ ".(\S)")
+                        if interactable.need == object_string:
+                            printT(" (\S)You use the " +itemcolour+ object_string +textcolour+ " with the " +interactcolour+ interactable.name +textcolour+ ".(\S)")
                             Inspect(interactable.name.lower())
                             break  # breaks so only uses it on first interactable that needs it and doesn't cause duplicates or looping
             else:
-                printT(" (\S)You can't find a " + objectName + " around here. Maybe it's your hungover brain.")
+                printT(" (\S)You can't find a " + object_string + " around here. Maybe it's your hungover brain.")
         elif verb in ['g','give']:
             x, y, z, dim = PLAYER.location
             # checks all Enemies in area to see if item_object is needed
@@ -487,24 +488,24 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
                                  + MAPS[x][y][z][dim].items + MAPS[x][y][z][dim].ENEMY
             match = False
             for i in surroundingobjects:  # checks to make sure in surroundings
-                if i.name.lower() == objectName.lower():
+                if i.name.lower() == object_string.lower():
                     match = True
             if match:
                 for enemy in MAPS[x][y][z][dim].ENEMY:  # for all enemy in the area
-                    if enemy.need == objectName:
-                        printT(" (\S)You give the " +itemcolour+ objectName +textcolour+ " to " +personcolour+ enemy.name +textcolour+ ". (\S)")
+                    if enemy.need == object_string:
+                        printT(" (\S)You give the " +itemcolour+ object_string +textcolour+ " to " +personcolour+ enemy.name +textcolour+ ". (\S)")
                         Talk(enemy.name.lower())
             else:
-                printT(" (\S)You can't find a " + objectName + " around here. Maybe it's your hungover brain.")
+                printT(" (\S)You can't find a " + object_string + " around here. Maybe it's your hungover brain.")
         elif verb in ["say",'sing']:
-            printT("You " + str(verb) + " " + objectName)
+            printT("You " + str(verb) + " " + object_string)
         elif verb in ["pet","scratch"]:
-            if objectName in ENEMIES and (list(ENEMIES[objectName].location) == PLAYER.location):
-                if isinstance(ENEMIES[objectName], Animal):
-                    printT("You " + verb + " " +personcolour+ ENEMIES[objectName].name +textcolour+ ".(\S)")
-                    printT(ENEMIES[objectName].pet_me())
+            if object_string in ENEMIES and (list(ENEMIES[object_string].location) == PLAYER.location):
+                if isinstance(ENEMIES[object_string], Animal):
+                    printT("You " + verb + " " +personcolour+ ENEMIES[object_string].name +textcolour+ ".(\S)")
+                    printT(ENEMIES[object_string].pet_me())
                 else:
-                    printT("You " + verb + " " +personcolour+ ENEMIES[objectName].name +textcolour+ ".(\S)They actually didn't mind that.")
+                    printT("You " + verb + " " +personcolour+ ENEMIES[object_string].name +textcolour+ ".(\S)They actually didn't mind that.")
         elif verb == '/script':
             scriptpath = os.path.join(os.getcwd(), "Dev","","PlaythroughScripts","",wordlist[1])
             try:

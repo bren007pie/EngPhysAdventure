@@ -21,6 +21,21 @@
 # 0.31 Anniversary update
 - [x] Attempt to see if you can get different modules to import conditionally - Nov. 19, 2020
 - [x] Seperate all hard-coded objects to completly seperate the game engine and game
+- [ ] Properly rewrite gamefunctions into gameclasses player methods, year them, and maybe even remove script interfaces. 
+        Rename gamefunctions to enginefucntions
+    - [x] Refactor **Equip** into method and test
+    - [ ] Refactor **Drop** into method and test
+    - [ ] Refactor **Move** into method and test
+    - [ ] Refactor **Combat** into method and test
+    - [ ] Refactor **Attack** into the combat method and test
+    - [ ] Refactor **Talk** into method and test
+    - [ ] Refactor **stats** into method and test
+    - [ ] Refactor **Inspect examine** into method and test
+    - [ ] Refactor **Inspect use** into method and test
+    - [ ] Refactor **Inventory** into method and test
+    - [ ] Refactor **Eat** into method and test
+         
+        
 - [ ] Get rid of total imports (* brining everything into namespace) 
         so can clearly see and define how to do import dependencies
 
@@ -37,8 +52,7 @@
 - 2020 = 2020-2021 COVID Text Adventure  (Hollywood)
 
 # 0.32 Nevada Engine Refactor
-- [ ] Properly rewrite gamefunctions into gameclasses, year them, and maybe even remove script interfaces. 
-        Rename gamefunctions to enginefucntions
+- [ ] Text parser becomes controlls
 - [ ] Everything should be in the main loop
 - [ ] All objects/save files shouldn't be script based. Should be file based.
 - [ ] Redo Map into adjacency lists
@@ -49,6 +63,7 @@
 
 
 # Done so Far
+- Slowly coverting almost everything to PP8 variable naming (something_something for everything except MyClasses)
 - Seperated game objects and gamescripts from old version
 - Adding scriptting functions to further encapsulate the game engine and game code
 - Added killing BF acheivement
@@ -60,6 +75,12 @@
 - If you die after beating the game you can keep replaying so you're pretty much invincible. 
 LOL I don't care 2017, it was finished so not fixing. If you beat the game you get to be invincible XD
 - In Python3 input can't take ANSII escape characters so had to fix all those
+
+# Advice from Dr. Carette/G-Scale
+- Break things down into tasks that with a resolution of taking you 1 hour to complete. 
+    If you don't know how to break that task down then your only task is to figure out how to break that down.
+- Sometimes can start with something that's good enough and then begin refactoring the most important bits at a time.
+    (That's what I'm doing here with the NEVADA game engine)
 
 # Things to Read
 * https://dzone.com/articles/python-thread-part-1

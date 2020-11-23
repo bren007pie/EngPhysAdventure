@@ -4,7 +4,7 @@ This is the main entrance file for the Nevada game engine and Eng Phys Text Adve
 The comments, organization, and optimization are bad but generally:
 this file = the setup, main loop, and ending. Run this to run the game.
 GameFunctions.py = The main mechanics of the game and the quests. All non-class functions. 
-game_classes.py = Class definitions and their coresponding functions.
+game_classes_2017.py = Class definitions and their coresponding functions.
 game_objects_x.py = All the map locations, items, npcs (called enemies), and interactables. Also creates the dictionaries of them.
 Setup.py = Py2exe file used to compile into an exe. Run using "python setup.py py2exe" in command prompt.
 
@@ -141,7 +141,7 @@ def Setup(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS
     
     return MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS
 
-def Main(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):
+def game_loop(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):
     # # These are all the global dictionaries/objects in the game. Anywhere where a loadgame happens you need all the global variables
     # global PLAYER #The main character. player is an object instance of class character.
     # global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
@@ -161,6 +161,7 @@ def Main(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
     while(PLAYER.alive):
         # if not(GAMESETTINGS['HardcoreMode']): MapDisplay.mini()  # Minimap display area in game
 
+        # --- Get user Input ---
 
         if GAMEINFO['scriptdata']: # if there's a script loaded carry out those commands! instead of normal
             command = GAMEINFO['scriptdata'].pop(0)  # pops the first element to go through script until finished
@@ -171,6 +172,7 @@ def Main(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
         print(LINEBREAK)  # This linebreak helps split up each turn
         if GAMESETTINGS['HardcoreMode']: print(CLEARSCREEN)
 
+        # --- Update the game world and update graphics (currently coupled) ---
         # Sends the command text to the text parser to be interpreted and action to be done.
         # I made a whole text interpreter for text symantics here? DAMN LOL - BF Nov 20, 2020
         MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = TextParser.Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
@@ -257,11 +259,11 @@ def End(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):
         print(LINEBREAK)
         QUESTS['restored order'] = 0  # turn this off so you can continue playing the game without the quest redoing
         QUESTS['create chaos'] = 0
-        Main(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # returns to the main (hopefully in the same state)
+        game_loop(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # returns to the main (hopefully in the same state)
     elif endchoice in ["r","restart game","restart"]:
         MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = load_game("basegame") #loads in the savefile global variables
         GAMEINFO['timestart'] = time.time() #reset local variable starttime to current time
-        Main(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS) #re-enters the main loop
+        game_loop(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS) #re-enters the main loop
     # No return to main menu implemented due to bad looping structure
     # elif endchoice in ["m","main menu return","main menu","menu return","main","menu","return"]:
     #     Opening.StartScreen()  # Startscreen loop where you can play new game, loadgame, choose settings, or exit
@@ -326,11 +328,11 @@ MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = start_s
 # The Actual Start of the game when you hit Play, depending on if in Dev Mode or not
 if GAMEINFO['devmode']:  # If Dev mode enabled no error catching
     MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = Setup(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
-    Main(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
+    game_loop(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
 else:  # Dev mode not enabled so error catching
     try:  # runs the main functions (the whole game bassically)
         MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = Setup(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
-        Main(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
+        game_loop(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
     # end function is run at the end of main loop so you can restart the game
     except (KeyboardInterrupt, SystemExit):  # if keyboard pressed or x out of the game, this is so it doesn't save null data when you press teh keyboard
         raise
