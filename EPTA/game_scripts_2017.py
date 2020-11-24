@@ -618,11 +618,11 @@ def events(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTING
                         continue  # advance to the next i
                     k += 1
                     if k == upgradechoice:
-                        upgrade = PLAYER.inv[i]  # copying the object to a temp variable
+                        upgrade_object = PLAYER.inv[i]  # Objecst are first-class so can create them dynamically in Python
                     elif k == sacrificechoice:
-                        sacrifice = PLAYER.inv[i]  # copying object to a temp variable
+                        sacrifice_object = PLAYER.inv[i]  # copying object to a temp variable
 
-                printT("Upgrading: " + upgrade.colouredname + "\nSacrificing: " + sacrifice.colouredname + "\n\nThis cannot be undone. \nType Y if this is correct:")
+                printT("Upgrading: " + upgrade_object.colouredname + "\nSacrificing: " + sacrifice_object.colouredname + "\n\nThis cannot be undone. \nType Y if this is correct:")
                 if input("").lower() in ["y", 'yes', '1']:
                     pass  # if they're sure they want to do something go foward
 # The pass statement in Python is used when a statement is required syntactically but you do not want code to execute.
@@ -630,40 +630,42 @@ def events(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTING
                     break
                     upgradechoice = 0
                     sacrificechoice = 0
-                # Dropping the items
-                PLAYER.drop(upgrade)  # Item is removed from the player inventory
-                PLAYER.drop(sacrifice)  # Item is removed from the player inventory
-                #del ITEMS[upgrade.name.lower()]  # deleting from the items dictionary so isn't around
-                #del ITEMS[sacrifice.name.lower()]  # deleting from the items dictionary so isn't around
+                # Dropping the items (removing them)
+                ITEMS[upgrade_object.name.lower()].location = (None,None,None,None)  # setting object location to none. Does this need to be done? I don't think so but just to be safe
+                ITEMS[sacrifice_object.name.lower()].location = (None,None,None,None)  # NONE has to be this format or else not comparible to other locations and will break
+                PLAYER.inv[upgrade_object.worn] = PLAYER.emptyinv[upgrade_object.worn]  # Set item to empty so item is removed from the player inventory but not placed in the world so not recoverable.
+                PLAYER.inv[sacrifice_object.worn] = PLAYER.emptyinv[sacrifice_object.worn]  # Set item to empty so item is removed from the player inventory but not placed in the world so not recoverable.
+                #del ITEMS[upgrade.name.lower()]  # deleting from the items dictionary, don't want to do this, might run into key errors
+                #del ITEMS[sacrifice.name.lower()]  # deleting from the items dictionary, don't want to do this, might run into key errors
 
                 # Upgrading the one item_object based on the sacrifice
                 printT("The Machine Reads: " +wincolour+ "'Pack-a-Punching" +indicatecolour+ " Please Wait" +textcolour+ "'")
-                upgrade.colouredname = "" +wincolour+"Better " +itemcolour+ upgrade.name +textcolour+""  # Adding Better to left side of name each time it's upgraded
-                upgrade.name = "Better " + upgrade.name  # Adding Better to left side of name each time it's upgraded
-                sumUStats = upgrade.stats[0] + upgrade.stats[1] + upgrade.stats[2]  # taking the sum of the stats of each item_object
-                sumSStats = sacrifice.stats[0] + sacrifice.stats[1] + sacrifice.stats[2]
+                upgrade_object.colouredname = "" +wincolour+"Better " +itemcolour+ upgrade_object.name +textcolour+""  # Adding Better to left side of name each time it's upgraded
+                upgrade_object.name = "Better " + upgrade_object.name  # Adding Better to left side of name each time it's upgraded
+                sumUStats = upgrade_object.stats[0] + upgrade_object.stats[1] + upgrade_object.stats[2]  # taking the sum of the stats of each item_object
+                sumSStats = sacrifice_object.stats[0] + sacrifice_object.stats[1] + sacrifice_object.stats[2]
                 # Sum of item_object stats of sacrifice has to be 1/10th that of the PAP item_object to double or add (whichever is better), or else they just add
                 if sumUStats / 10 <= sumSStats:
                     # Doubling stats of the item_object
                     if sumUStats + sumSStats > sumUStats * 2:
-                        upgrade.stats = (upgrade.stats[0] + sacrifice.stats[0], upgrade.stats[1] + sacrifice.stats[1],
-                                         upgrade.stats[2] + sacrifice.stats[2])  # replacing stats tuple with sum
+                        upgrade_object.stats = (upgrade_object.stats[0] + sacrifice_object.stats[0], upgrade_object.stats[1] + sacrifice_object.stats[1],
+                                         upgrade_object.stats[2] + sacrifice_object.stats[2])  # replacing stats tuple with sum
                     else:
-                        upgrade.stats = (upgrade.stats[0] * 2, upgrade.stats[1] * 2,
-                                         upgrade.stats[2] * 2)  # replacing stats tuple with doubling them
+                        upgrade_object.stats = (upgrade_object.stats[0] * 2, upgrade_object.stats[1] * 2,
+                                         upgrade_object.stats[2] * 2)  # replacing stats tuple with doubling them
                 else:
                     # Adding the Stats
-                    upgrade.stats = (upgrade.stats[0] + sacrifice.stats[0], upgrade.stats[1] + sacrifice.stats[1],
-                                     upgrade.stats[2] + sacrifice.stats[2])  # replacing stats tuple
+                    upgrade_object.stats = (upgrade_object.stats[0] + sacrifice_object.stats[0], upgrade_object.stats[1] + sacrifice_object.stats[1],
+                                     upgrade_object.stats[2] + sacrifice_object.stats[2])  # replacing stats tuple
 
 
-                upgrade.location = (2,4,3,0)
-                ITEMS[upgrade.name.lower()] = upgrade  # writing it to the ITEMS dictionary
-                MAPS[2][4][3][0].place_item(upgrade)  # Placing the Upgraded Item on the ground
+                upgrade_object.location = (2,4,3,0)
+                ITEMS[upgrade_object.name.lower()] = upgrade_object  # writing it to the ITEMS dictionary
+                MAPS[2][4][3][0].place_item(upgrade_object)  # Placing the Upgraded Item on the ground
 
                 # TODO problem is that allkeys are not updated for spellchecking
 
-                printT("The "+interactcolour+"Pack-a-Punch "+textcolour+"wirls and screaches, glowing bright, before spitting out the " + upgrade.colouredname + " onto the ground!")
+                printT("The "+interactcolour+"Pack-a-Punch "+textcolour+"wirls and screaches, glowing bright, before spitting out the " + upgrade_object.colouredname + " onto the ground!")
                 # TODO add pack-a-punch sound
 
         # Resetting quest flag so you don't always inspect it once you enter the room
@@ -690,7 +692,8 @@ def events(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTING
             printT("You feel compelled to take your "+itemcolour+"shirt "+losecolour+"off "+textcolour+"and drop it on the ground")
             # Drops the item_object you have on you, don't forget it has to be name of the item_object and lowercase.
             # Also can't be PLAYER.drop function because then it doesn't go onto the ground
-            Drop(PLAYER.inv['body'].name.lower())
+            MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = PLAYER.drop_object(PLAYER.inv['body'].name.lower(), MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # drops your shirt on the ground
+
 
     # Killcount counter in player will trigger the police eventually
 

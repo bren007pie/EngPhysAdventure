@@ -13,7 +13,8 @@
 - [ ] When you exit from the start screen or otherwise the error catcher catches you
 - [ ] Check to make sure nest game, correct times, and everything add up
 - [ ] Die after winning the game you still get the credits and win dialog, AND THEN CONTINUE. Okay that's bad. - 0.30 Nov. 22, 2020
-
+- [ ] 0.30_dev_neut_complete.txt doesn't "REALLY" do everything in the game. Don't care for 2017 but future games.
+A true scripted playthrough should do an actual 100% of the game (test all major functions, all scripted events, go everywhere, kill everyone etc)
 
 
         
@@ -24,7 +25,7 @@
 - [ ] Properly rewrite gamefunctions into gameclasses player methods, year them, and maybe even remove script interfaces. 
         Rename gamefunctions to enginefucntions
     - [x] Refactor **Equip** into method and test
-    - [ ] Refactor **Drop** into method and test
+    - [X] Refactor **Drop** into method and test
     - [ ] Refactor **Move** into method and test
     - [ ] Refactor **Combat** into method and test
     - [ ] Refactor **Attack** into the combat method and test
@@ -52,7 +53,8 @@
 - 2020 = 2020-2021 COVID Text Adventure  (Hollywood)
 
 # 0.32 Nevada Engine Refactor
-- [ ] Text parser becomes controlls
+- [ ] Packaging 8 variables into a game-state which you pass along
+- [ ] Text parser becomes controlls or interpreter
 - [ ] Everything should be in the main loop
 - [ ] All objects/save files shouldn't be script based. Should be file based.
 - [ ] Redo Map into adjacency lists

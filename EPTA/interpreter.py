@@ -432,10 +432,10 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
 
         #  --- Parsing ---
         if verb in ['e','equip', 'get', 'wear']:
-            MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = PLAYER.equip(object_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # equip method of the player
+            MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = PLAYER.equip_object(object_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # equip method of the player
 
         elif verb in ['dr','drop', 'throw']:
-            Drop(object_string)
+            MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = PLAYER.drop_object(object_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
 
         elif verb in ['a','attack', 'kill', 'fight']:
             Attack(object_string)
@@ -461,7 +461,7 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
             CreativeMode.creative_parser(object_string)
 
         elif verb == "pick":  # Allows for pick up to be a thing, is formatted in exceptions above
-            MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = PLAYER.equip(object_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # equip method of the player
+            MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = PLAYER.equip_object(object_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # equip method of the player
 
         elif verb in ['us','use']:  # this makes it so you can use items if the interacble is in the area
             x, y, z, dim = PLAYER.location

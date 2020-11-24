@@ -36,7 +36,7 @@ print("BLARG")
 from GameFunctions import * #this imports the code and all the code dependancies (functions imported in that)
 import start_screen    #don't import * from these b.c. these pull global variables from game functions and doing a recursive import creates errors
 #import game_scripts_2017 as game_scripts  # Used to separate quest/event functions
-import TextParser  # Used to separate text interpretation and commands
+import interpreter  # Used to separate text interpretation and commands
 import AsciiArt
 
 #from TextParser import *  got rid of this to reduce import tracing tracking problems but may break everything
@@ -175,7 +175,7 @@ def game_loop(MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETT
         # --- Update the game world and update graphics (currently coupled) ---
         # Sends the command text to the text parser to be interpreted and action to be done.
         # I made a whole text interpreter for text symantics here? DAMN LOL - BF Nov 20, 2020
-        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = TextParser.Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
+        MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = interpreter.Parser(command, MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)
 
         GAMEINFO['commandcount'] += 1  # increments the command count after every command but doesn't print
         #print LINEBREAK  # Got rid of this bottom linebreak to hopefully have the current situation more clear

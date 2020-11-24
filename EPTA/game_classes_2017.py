@@ -64,7 +64,7 @@ class Character:
     def update_stats(self): #updates stats based on changing equipment
         self.stats = six_tuple_add(self.inv['head'].stats, self.inv['body'].stats, self.inv['hand'].stats, self.inv['off-hand'].stats, tuple(self.basestats), (0, 0, 0))
 
-    def equip(self, item_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):
+    def equip_object(self, item_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):
         x = self.location[0]
         y = self.location[1]
         z = self.location[2]
@@ -117,21 +117,38 @@ class Character:
         else:
             printT(" (\S)You can't find a " + itemcolour + item_string + textcolour + " around here. Maybe it's your hungover brain.")
 
-        # return drop
         return MAPS, self, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS  # returning the game state
 
 
 
-    def drop(self, drop_item_object):  # Equip is an object not a name
-        drop = 0
-        if(drop_item_object.name == self.inv[drop_item_object.worn].name):
-            self.inv[drop_item_object.worn] = self.emptyinv[drop_item_object.worn]
-            printT(" (\S)You've dropped the " + drop_item_object.colouredname + ".")
-            drop = drop_item_object
+    def drop_object(self, item_string, MAPS, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS):  # Equip is an object not a name
+        x = self.location[0]
+        y = self.location[1]
+        z = self.location[2]
+        dim = self.location[3]
+        Place = MAPS[x][y][z][dim]
+        if item_string in ITEMS and list(ITEMS[item_string].location) == self.location:
+            drop_item_object = ITEMS[item_string]
+            if (drop_item_object.name == self.inv[drop_item_object.worn].name):
+                self.inv[drop_item_object.worn] = self.emptyinv[drop_item_object.worn]
+                printT(" (\S)You've dropped the " + drop_item_object.colouredname + ".")
+                Place.place_item(drop_item_object)  # places the drop on the ground
+            else:
+                printT("Maybe you're still drunk?. You aren't carrying " + drop_item_object.colouredname + ".")
+            self.update_stats()
+
+        # other acceptations for weird requests
+        elif item_string in INTERACT and list(INTERACT[item_string].location) == self.location:  # Interacts
+            printT("You probably shouldn't drop the " + str(INTERACT[item_string].colouredname) + ". Something might break.")
+        elif item_string in ENEMIES and list(ENEMIES[item_string].location) == self.location and ENEMIES[item_string].alive:  # People
+            printT("You drop " + ENEMIES[item_string].colouredname + " but they were never yours, to begin with. (\S)Now you just have one less friend...")
+        elif item_string in ENEMIES and list(ENEMIES[item_string].location) == self.location and not ENEMIES[item_string].alive:  # Dead People
+            printT("You pick up " + deadpersoncolour + ENEMIES[item_string].name + textcolour + "'s body and drop it. Do you get a kick out of this?")
         else:
-            printT("Maybe you're still drunk?. You aren't carrying " + drop_item_object.colouredname + ".")
-        self.update_stats()
-        return drop
+            printT("Maybe you're still drunk?. You aren't carrying a " + itemcolour + item_string + textcolour + ".")
+
+
+        return MAPS, self, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS  # returning the game state
 
     def show_inventory(self):
 

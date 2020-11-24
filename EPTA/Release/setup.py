@@ -24,7 +24,7 @@ https://bitbucket.org/anthony_tuininga/cx_freeze/issues/48/documentation-of-how-
 
 Thank you to Anythony Tuininga for this awesome module and all the work!
 """
-
+# TODO: Make a make file/system for automatically building this stuff on linuix
 
 # THIS SCRIPT SHOULD BE CALLED SETUP.PY
 

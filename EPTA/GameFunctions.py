@@ -117,38 +117,6 @@ elif platform == "darwin":  # OS X/MAC
 
 # TODO Make these game functions into class methods related to each class
 
-def Drop(item_string):  # item_string is a string not an object
-    global PLAYER #The main character. player is an object instance of class character.
-    global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
-    global MAPS #All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
-    global INTERACT #All the interactables (stationary things that need something). This a dictionary of objects of class interact_object keyed by their lowcase name (interact.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
-    global QUESTS #Quest statuses. This is a dictionary of flags (1 or 0) for the status of the quest keyed by quest name.
-    global ENEMIES #All the npcs. This a dictionary of objects of class enemy_object keyed by their lowcase equipment name (item_object.name.lower()). Remember the lowercase, may trip you up if referencing upercase version in the file.
-    global GAMEINFO #Miscellaneous game info. Dictionary of all sorts of variables
-    global GAMESETTINGS # The game settings that are saved in the game
-
-    x = PLAYER.location[0]
-    y = PLAYER.location[1]
-    z = PLAYER.location[2]
-    dim = PLAYER.location[3]
-    Place = MAPS[x][y][z][dim]
-    if item_string in ITEMS and list(ITEMS[item_string].location) == PLAYER.location:
-        # TODO Redo this drop and equip structure. Is dumb and can cause duplicates/ghosting
-        drop = PLAYER.drop(ITEMS[item_string])  # the player drop method that will return the item_object dropped
-        Place.place_item(drop)  # places the drop on the ground
-        # Same as equip function. 'None' passed to function if item_object doesn't exist
-
-    # other acceptations for weird requests
-    elif item_string in INTERACT and list(INTERACT[item_string].location) == PLAYER.location: # Interacts
-        printT("You probably shouldn't drop the " + str(INTERACT[item_string].colouredname) + ". It might break.")
-    elif item_string in ENEMIES and list(ENEMIES[item_string].location) == PLAYER.location and ENEMIES[item_string].alive: # People
-        printT("You drop " + ENEMIES[item_string].colouredname + " but they were never yours, to begin with. (\S)Now you just have one less friend...")
-    elif item_string in ENEMIES and list(ENEMIES[item_string].location) == PLAYER.location and not ENEMIES[item_string].alive: # Dead People
-        printT("You pick up " +deadpersoncolour+ ENEMIES[item_string].name +textcolour+ "'s body and drop it. Do you get a kick out of this?")
-    else:
-       printT("Maybe you're still drunk?. You aren't carrying a " +itemcolour+ item_string +textcolour+ ".")
-
-
 
 def Move(direction,DIRECTIONWORDS,DIRECTIONSHORTCUTS):  # Could do function wrappers but going to just pass functions
     global PLAYER #The main character. player is an object instance of class character.
