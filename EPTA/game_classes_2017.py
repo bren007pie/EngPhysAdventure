@@ -150,7 +150,7 @@ class Character:
 
         return MAPS, self, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS  # returning the game state
 
-    def show_inventory(self):
+    def show_inventory(self):  # User display
 
         Head = "head\t\t"+self.inv['head'].name+"\t"+str(self.inv['head'].stats)+"\n"
         Body = "body\t\t"+self.inv['body'].name+"\t"+str(self.inv['body'].stats)+"\n"
@@ -158,7 +158,7 @@ class Character:
         OffHand = "off-hand\t"+self.inv['off-hand'].name+"\t"+str(self.inv['off-hand'].stats)+"\n"
         printT("INVENTORY: (\S)" + Head + Body + Hand + OffHand)
 
-    def show_attributes(self):
+    def show_attributes(self):  # Devmode display showing the stats
         print("name: " + str(self.name))
         print("location: " + str(self.location))
         self.show_inventory()

@@ -118,7 +118,7 @@ elif platform == "darwin":  # OS X/MAC
 # TODO Make these game functions into class methods related to each class
 
 
-def Move(direction,DIRECTIONWORDS,DIRECTIONSHORTCUTS):  # Could do function wrappers but going to just pass functions
+def Move(direction):
     global PLAYER #The main character. player is an object instance of class character.
     global ITEMS #All the items. This a dictionary of objects of class equipment keyed by their lowcase equipment name (item_object.name). Remember the lowercase, may trip you up if referencing upercase version in the file.
     global MAPS #All the locations. A tuple of objects of class Map inxed by there x,y,z coordinate (MAPS[x][y][z])
@@ -135,7 +135,7 @@ def Move(direction,DIRECTIONWORDS,DIRECTIONSHORTCUTS):  # Could do function wrap
     currentplace = MAPS[x][y][z][dim]  # Saving your current map location to a variable
     place = 0
     # Direction parsing and redefining so that it matches wall character
-    if direction in DIRECTIONSHORTCUTS: pass  # Don't need to parse direction if a shortcut
+    if direction in ['u', 'd', 'f', 'b', 'l', 'r']: pass  # Don't need to parse direction if a shortcut
     elif direction == 'up': direction = 'u'
     elif direction == 'down': direction = 'd'
     elif direction in ['front', 'forward', 'ahead','west']: direction = 'f'
@@ -182,6 +182,7 @@ def Move(direction,DIRECTIONWORDS,DIRECTIONSHORTCUTS):  # Could do function wrap
 
     # -- This is the sucessfull movement function  --
     if place:
+        # going to get rid of scripting cause game functions are being refactored into modules
         from game_scripts_2017 import move_script  # Important has to be in function to avoid global function recursion import error. I.E. can't just import gamescripts globally in gamefunctions.
         MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS = move_script(place, MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAMESETTINGS)  # scripting interface
 

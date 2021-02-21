@@ -80,7 +80,7 @@ from GameFunctions import *
 import CreativeMode
 import AsciiArt
 
-# acceptable game commands called 'verbs'. Need to add verb to this list for it to work in game decision area
+# acceptable game commands called 'verbs'. Need to add verb to this list for it to be allowed by the spell checker.
 VERBS = ['search', 'inventory', 'equip', 'drop', 'attack', 'talk', 'inspect', 'eat', 'kill', 'get', 'wear', 'look',
          'drink', 'inhale', 'ingest', 'devour', 'fight', 'examine', 'exit', 'leave', 'quit', 'speak', 'throw', 'go',
          'move','walk', 'run', 'turn', 'remember', "wait", "sleep", 'sit', 'die', 'pick', 'use', 'give', 'say', 'help',
@@ -95,9 +95,9 @@ DEVVERBS.extend(VERBS)  # Combining all the normal verbs into DEVVERBS to make t
 VERBSHORTCUTS = ['a', 'b','c', 'd', 'dr', 'e', 'ea', 'ex', 'f', 'g', 'h', 'i', 'l', 'r', 're', 's', 't', 'u', 'us']
 
 # List of Direction words used to check direction. NEED TO ADD DIRECTIONS TO HERE AND IN MOVE() FUNCTION IN GAMEFUNCTIONS
-DIRECTIONSHORTCUTS = ['u', 'd', 'f', 'b', 'l', 'r']
+DIRECTIONSHORTCUTS = ['u', 'd', 'f', 'b', 'l', 'r']  # if adding directionshortcuts make sure to add to PLAYER.move()
 DIRECTIONWORDS = ['up', 'down', 'front', 'forward', 'ahead', 'back', 'backward',
-                  'left', 'right',  'north', 'south', 'east', 'west','around']
+                  'left', 'right',  'north', 'south', 'east', 'west','around']  # around is in here just for spellchecking as a noun
 VERBS.extend(DIRECTIONWORDS)  # extends verbs so these directions can be recognized in spellchecking
 
 # keys of all objects in game used for spellchecking of objects
@@ -193,7 +193,7 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
 
         #  --- Parsing ---
         if (verb in DIRECTIONSHORTCUTS) or (verb in DIRECTIONWORDS):  # if the verb is a direction verb
-            CurrentPlace = Move(verb,DIRECTIONWORDS,DIRECTIONSHORTCUTS)  # TODO check if CurrentPlace is actually returned and if so, use it
+            CurrentPlace = Move(verb)  # TODO check if CurrentPlace is actually returned and if so, use it
             GAMEINFO['stepcount'] += 1  # increments the stepcount after taking a step (whether sucessful or not)
         elif verb in [ 's','search', 'look']:
             x, y, z, dim = PLAYER.location
@@ -454,7 +454,7 @@ def Parser(command,MAPS, PLAYER, ITEMS, INTERACT, QUESTS, ENEMIES, GAMEINFO, GAM
             Eat(object_string)
 
         elif verb in ['go', 'move', 'walk', 'run', 'turn']:  # this may or may not work
-            CurrentPlace = Move(object_string,DIRECTIONWORDS,DIRECTIONSHORTCUTS)
+            CurrentPlace = Move(object_string)
             GAMEINFO['stepcount'] += 1  # increments the stepcount after taking a step (whether sucessful or not)
 
         elif verb == "/":  # if using a CreativeMode command
